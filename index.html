@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Gordo 2026 | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        :root { --bg-color: #FDFBFA; --primary: #0D9488; --secondary: #F43F5E; --accent: #EAB308; --stone-900: #1C1917; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); color: var(--stone-900); }
+        .tab-active { color: var(--primary); border-bottom: 3px solid var(--primary); font-weight: 700; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(229, 231, 235, 0.5); }
+        .custom-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        input:focus, select:focus { outline: none; border-bottom: 2px solid var(--primary); }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .table-input { background: transparent; width: 100%; padding: 4px; border-bottom: 1px solid transparent; transition: all 0.2s; }
+        .table-input:hover { border-bottom-color: #e5e7eb; }
+        .table-input:focus { border-bottom-color: var(--primary); background: rgba(13, 148, 136, 0.05); }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+    <div id="loading" class="loading-overlay font-bold text-teal-800 flex flex-col gap-4">
+        <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+        <span>A carregar planeamento...</span>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🌴</span>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-teal-900">Monte Gordo 2026</h1>
+                    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest">Dashboard Colaborativo</p>
+                </div>
+            </div>
+            <nav class="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto max-w-full">
+                <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="px-4 py-2 text-sm rounded-lg transition-all tab-active whitespace-nowrap">Resumo</button>
+                <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Logística</button>
+                <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Financeiro</button>
+                <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Itens para levar</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Chosen Palette: Coastal Elegance -->
+        <!-- Application Structure Plan: Interactive Dashboard with Firestore sync. Unified columns for Logistics. Dynamic add/remove for all lists. -->
+
+        <!-- SECTION: RESUMO -->
+        <section id="tab-resumo" class="space-y-6 block">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 glass-panel p-8 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
+                        <p class="text-stone-600 leading-relaxed max-w-lg">
+                            Este é o vosso espaço centralizado. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
+                        </p>
+                        <p id="user-display" class="mt-4 text-[10px] text-stone-400 font-mono"></p>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Partida</span>
+                            <span class="text-sm font-bold text-teal-800">29 Dez 2026</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Regresso</span>
+                            <span class="text-sm font-bold text-teal-800">02 Jan 2027</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 col-span-2 sm:col-span-1 text-center">
+                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Estadia</span>
+                            <span class="text-sm font-bold text-teal-800">4 Noites</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-teal-900 text-white p-8 rounded-3xl shadow-xl flex flex-col items-center text-center">
+                    <h3 class="text-lg font-bold mb-4">Progresso do Fundo</h3>
+                    <div class="relative w-40 h-40 mb-4">
+                        <canvas id="progressChart"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="pct-display" class="text-2xl font-black">0%</span>
+                            <span class="text-[8px] uppercase opacity-70">Pago</span>
+                        </div>
+                    </div>
+                    <p class="text-xs opacity-80">Meta Total: R$ 4.320,00</p>
+                    <p id="total-raised-display" class="text-xl font-black mt-2 text-teal-300 italic">R$ 0,00</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: LOGÍSTICA -->
+        <section id="tab-logistica" class="hidden space-y-8">
+            <!-- Alojamento -->
+            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold flex items-center gap-2 text-rose-600"><span>🏠</span> Alojamento</h3>
+                    <button onclick="addLogEntry('airbnb')" class="text-[10px] font-bold bg-rose-50 text-rose-600 px-4 py-2 rounded-full hover:bg-rose-100 transition-all">+ Adicionar Opção</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                <th class="py-3 px-4">Airbnb</th>
+                                <th class="py-3 px-4">Obs / Detalhes</th>
+                                <th class="py-3 px-4 text-center w-32">Valor (R$)</th>
+                                <th class="py-3 px-4 text-center">Link</th>
+                                <th class="py-3 px-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="airbnb-table-body" class="divide-y divide-stone-50"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Transportes -->
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
+                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-100">+ Adicionar</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-4">Cia</th>
+                                    <th class="py-3 px-4 text-center">Valor (R$)</th>
+                                    <th class="py-3 px-4 text-right">Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bus-table-body" class="divide-y divide-stone-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Alimentação -->
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Alimentação</h3>
+                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Item</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-4">Item</th>
+                                    <th class="py-3 px-4 text-center">Valor (R$)</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                    <th class="py-3 px-4 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="food-table-body" class="divide-y divide-stone-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: FINANCEIRO -->
+        <section id="tab-financeiro" class="hidden space-y-6">
+            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100 overflow-x-auto">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-extrabold text-stone-900">Mapa de Pagamentos</h3>
+                    <p class="text-stone-500 text-xs mt-1">Clica no círculo para alternar o pagamento (R$ 80,00/mês).</p>
+                </div>
+                <table class="w-full text-center border-separate border-spacing-y-2">
+                    <thead>
+                        <tr class="text-[10px] font-bold text-stone-400 uppercase">
+                            <th class="px-4 py-2 text-left">Nome</th>
+                            <th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th><th>Out</th><th>Nov</th><th>Dez</th>
+                            <th class="text-right">Fundo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-table-body" class="text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION: CHECKLIST -->
+        <section id="tab-checklist" class="hidden space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-teal-700"><span>🎒</span> Itens para levar</h3>
+                        <button onclick="addChecklistItem('general')" class="text-[10px] font-bold bg-teal-50 text-teal-600 px-3 py-1 rounded-full hover:bg-teal-100">+ Adicionar</button>
+                    </div>
+                    <div id="check-list-general" class="space-y-3"></div>
+                </div>
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-700"><span>🎁</span> Outros / Extras</h3>
+                        <button onclick="addChecklistItem('extra')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-1 rounded-full hover:bg-orange-100">+ Adicionar</button>
+                    </div>
+                    <div id="check-list-extra" class="space-y-3"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Global Configs
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
+
+        const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Beatriz Pedreira", "Jonatan Santos", "Miguel Morelli"];
+        const months = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+        let currentUser = null;
+        let chartInstance = null;
+
+        // --- AUTH & INIT ---
+        async function init() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error("Erro Auth:", err); }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-display').innerText = `Ligado como: ${user.uid.substring(0,8)}`;
+                startSync();
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+
+        // --- REALTIME SYNC ---
+        function startSync() {
+            if (!currentUser) return;
+
+            // Payments Sync
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
+                const data = {};
+                snap.forEach(d => data[d.id] = d.data());
+                renderPayments(data);
+                updateChart(data);
+            });
+
+            // Logistics Sync
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
+                const logs = [];
+                snap.forEach(d => logs.push({ id: d.id, ...d.data() }));
+                renderLogistics(logs);
+            });
+
+            // Checklist Sync
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
+                const checks = [];
+                snap.forEach(d => checks.push({ id: d.id, ...d.data() }));
+                renderChecklists(checks);
+            });
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderPayments(data) {
+            const body = document.getElementById('payments-table-body');
+            body.innerHTML = "";
+            let total = 0;
+
+            participants.forEach(name => {
+                const pData = data[name] || { paid: ["Abr"] };
+                const row = document.createElement('tr');
+                row.className = "bg-white rounded-xl shadow-sm border border-stone-100 hover:bg-stone-50 transition-colors";
+                
+                let html = `<td class="px-4 py-4 text-left font-bold text-stone-800">${name}</td>`;
+                months.forEach(m => {
+                    const isPaid = pData.paid.includes(m);
+                    if (isPaid) total += 80;
+                    html += `
+                        <td class="px-2 py-4 cursor-pointer" onclick="togglePayment('${name}', '${m}')">
+                            <span class="${isPaid ? 'text-teal-600' : 'text-stone-200'} text-lg">${isPaid ? '✅' : '⚪'}</span>
+                        </td>`;
+                });
+                html += `<td class="px-4 py-4 text-right font-black text-stone-600">R$ ${pData.paid.length * 80}</td>`;
+                row.innerHTML = html;
+                body.appendChild(row);
+            });
+
+            document.getElementById('total-raised-display').innerText = `R$ ${total.toLocaleString('pt-BR')},00`;
+            document.getElementById('pct-display').innerText = `${Math.round((total / 4320) * 100)}%`;
+        }
+
+        function renderLogistics(logs) {
+            const airBody = document.getElementById('airbnb-table-body');
+            const busBody = document.getElementById('bus-table-body');
+            const foodBody = document.getElementById('food-table-body');
+
+            airBody.innerHTML = ""; busBody.innerHTML = ""; foodBody.innerHTML = "";
+
+            logs.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-stone-50 transition-colors";
+                
+                // Bug fix: Fallback values to prevent 'undefined'
+                const name = d.name || "";
+                const price = d.price || 0;
+                const obs = d.obs || "";
+                const link = d.link || "";
+                const status = d.status || "Pendente";
+
+                if (d.type === 'airbnb') {
+                    tr.innerHTML = `
+                        <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-3 px-4"><input class="table-input text-xs text-stone-500" value="${obs}" onblur="updateLog('${d.id}', 'obs', this.value)"></td>
+                        <td class="py-3 px-4 text-center"><input type="number" class="w-24 text-center font-bold text-teal-600" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-3 px-4 text-center"><input class="table-input text-[10px] text-teal-600 text-center" value="${link}" placeholder="Link" onblur="updateLog('${d.id}', 'link', this.value)"></td>
+                        <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                    airBody.appendChild(tr);
+                } else if (d.type === 'bus') {
+                    tr.innerHTML = `
+                        <td class="py-4 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-4 px-4 text-center"><input type="number" class="w-20 text-center text-teal-600 font-bold" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-4 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                    busBody.appendChild(tr);
+                } else if (d.type === 'food') {
+                    tr.innerHTML = `
+                        <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-3 px-4 text-center"><input type="number" class="w-20 text-center font-bold text-teal-600" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-3 px-4 text-center">
+                            <select onchange="updateLog('${d.id}', 'status', this.value)" class="text-[10px] p-1 rounded-full bg-stone-50">
+                                <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                                <option value="Comprado" ${status === 'Comprado' ? 'selected' : ''}>Comprado</option>
+                            </select>
+                        </td>
+                        <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                    foodBody.appendChild(tr);
+                }
+            });
+        }
+
+        function renderChecklists(checks) {
+            const genCont = document.getElementById('check-list-general');
+            const extraCont = document.getElementById('check-list-extra');
+            genCont.innerHTML = ""; extraCont.innerHTML = "";
+
+            checks.forEach(d => {
+                const label = document.createElement('label');
+                label.className = `flex items-center justify-between p-4 rounded-xl bg-stone-50 border border-stone-100 cursor-pointer hover:bg-stone-100 transition-all ${d.checked ? 'opacity-50' : ''}`;
+                label.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" ${d.checked ? 'checked' : ''} onchange="updateCheck('${d.id}', this.checked)" class="w-5 h-5 accent-teal-600">
+                        <input class="bg-transparent text-sm font-semibold text-stone-700 ${d.checked ? 'line-through' : ''}" value="${d.name}" onblur="updateCheckName('${d.id}', this.value)">
+                    </div>
+                    <button onclick="deleteCheckItem('${d.id}')" class="text-red-200 hover:text-red-400">❌</button>`;
+                if (d.category === 'general') genCont.appendChild(label);
+                else extraCont.appendChild(label);
+            });
+        }
+
+        // --- GLOBAL ACTIONS ---
+        window.updateLog = async (id, f, v) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id), { [f]: f === 'price' ? parseFloat(v) || 0 : v }, { merge: true }); };
+        window.addLogEntry = async (t) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', `log_${Date.now()}`), { type: t, name: "Novo Item", price: 0, obs: "", link: "", status: "Pendente" }); };
+        window.deleteLogEntry = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id)); };
+        
+        window.togglePayment = async (p, m) => {
+            if (!currentUser) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'payments', p);
+            const snap = await getDoc(ref);
+            let paid = snap.exists() ? snap.data().paid : ["Abr"];
+            paid = paid.includes(m) ? paid.filter(x => x !== m) : [...paid, m];
+            await setDoc(ref, { paid });
+        };
+
+        window.addChecklistItem = async (cat) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', `check_${Date.now()}`), { category: cat, name: "Novo item", checked: false }); };
+        window.updateCheck = async (id, c) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', id), { checked: c }, { merge: true }); };
+        window.updateCheckName = async (id, n) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', id), { name: n }, { merge: true }); };
+        window.deleteCheckItem = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', id)); };
+
+        // --- UI UTILS ---
+        function updateChart(data) {
+            let totalPaid = 0;
+            Object.values(data).forEach(p => totalPaid += (p.paid ? p.paid.length : 1) * 80);
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { datasets: [{ data: [totalPaid, Math.max(0, 4320 - totalPaid)], backgroundColor: ['#2DD4BF', 'rgba(255,255,255,0.1)'], borderWidth: 0 }] },
+                options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false } }
+            });
+        }
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => { b.classList.remove('tab-active', 'text-teal-900'); b.classList.add('text-stone-500'); });
+            document.getElementById(`tab-btn-${tabId}`).classList.add('tab-active', 'text-teal-900');
+        };
+
+        init();
+    </script>
+</body>
+</html>
