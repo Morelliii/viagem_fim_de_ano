@@ -207,7 +207,14 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Global Configs
-        const firebaseConfig = { apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o", authDomain: "viagemfimdeano2026.firebaseapp.com", projectId: "viagemfimdeano2026", storageBucket: "viagemfimdeano2026.firebasestorage.app", messagingSenderId: "949507681367", appId: "1:949507681367:web:d7c7b468d90bd1106a8712"};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o",
+            authDomain: "viagemfimdeano2026.firebaseapp.com",
+            projectId: "viagemfimdeano2026",
+            storageBucket: "viagemfimdeano2026.firebasestorage.app",
+            messagingSenderId: "949507681367",
+            appId: "1:949507681367:web:d7c7b468d90bd1106a8712"
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
