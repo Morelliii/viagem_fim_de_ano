@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,8 +25,8 @@
         <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
         <span>A carregar planeamento...</span>
     </div>
-    
-<div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
+
+    <div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl custom-shadow text-center max-w-md w-full mx-4">
             <span class="text-6xl mb-4 block">🌴</span>
             <h1 class="text-3xl font-extrabold text-teal-900 mb-2">Monte Gordo 2026</h1>
@@ -36,40 +36,39 @@
             </button>
         </div>
     </div>
-    
-    <!-- Header -->
+
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:grid md:grid-cols-3 items-center gap-4">
+            
+            <div class="flex items-center gap-3 justify-self-center md:justify-self-start">
                 <span class="text-3xl">🌴</span>
                 <div>
                     <h1 class="text-2xl font-extrabold tracking-tight text-teal-900">Monte Gordo 2026</h1>
                     <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest">Dashboard Colaborativo</p>
                 </div>
             </div>
-            <nav class="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto max-w-full">
+            
+            <nav class="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto max-w-full justify-self-center">
                 <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="px-4 py-2 text-sm rounded-lg transition-all tab-active whitespace-nowrap">Resumo</button>
                 <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Logística</button>
                 <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Financeiro</button>
                 <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Itens para levar</button>
             </nav>
+            
+            <div id="user-display" class="justify-self-center md:justify-self-end flex items-center gap-3"></div>
+            
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-        <!-- Chosen Palette: Coastal Elegance -->
-        <!-- Application Structure Plan: Interactive Dashboard with Firestore sync. Unified columns for Logistics. Dynamic add/remove for all lists. -->
-
-        <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="md:col-span-2 glass-panel p-8 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
                         <p class="text-stone-600 leading-relaxed max-w-lg">
-                            Este é o vosso espaço centralizado. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
+                            Este é o vosso space centralizado. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
                         </p>
-                        <p id="user-display" class="mt-4 text-[10px] text-stone-400 font-mono"></p>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
                         <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 text-center">
@@ -102,9 +101,7 @@
             </div>
         </section>
 
-        <!-- SECTION: LOGÍSTICA -->
         <section id="tab-logistica" class="hidden space-y-8">
-            <!-- Alojamento -->
             <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold flex items-center gap-2 text-rose-600"><span>🏠</span> Alojamento</h3>
@@ -127,7 +124,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Transportes -->
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
@@ -147,7 +143,6 @@
                     </div>
                 </div>
 
-                <!-- Alimentação -->
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Alimentação</h3>
@@ -170,7 +165,6 @@
             </div>
         </section>
 
-        <!-- SECTION: FINANCEIRO -->
         <section id="tab-financeiro" class="hidden space-y-6">
             <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100 overflow-x-auto">
                 <div class="mb-6">
@@ -190,7 +184,6 @@
             </div>
         </section>
 
-        <!-- SECTION: CHECKLIST -->
         <section id="tab-checklist" class="hidden space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
@@ -211,7 +204,6 @@
         </section>
     </main>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -230,7 +222,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider(); // Provedor do Google
+        const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Beatriz Pedreira", "Jonatan Santos", "Miguel Morelli"];
@@ -239,7 +231,7 @@
         let currentUser = null;
         let chartInstance = null;
 
-        // --- NOVA LÓGICA DE AUTH ---
+        // --- INTERAÇÕES DE AUTENTICAÇÃO ---
         document.getElementById('btn-login-google').addEventListener('click', () => {
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
@@ -247,21 +239,32 @@
         window.sairDoSistema = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
+            const loginScreen = document.getElementById('login-screen');
+            const loadingScreen = document.getElementById('loading');
+            const userDisplay = document.getElementById('user-display');
+            
             if (user) {
-                // Usuário logado! Esconde a tela de login e mostra o conteúdo
                 currentUser = user;
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('loading').classList.add('hidden');
+                loginScreen.classList.add('hidden');
+                loadingScreen.classList.add('hidden');
                 
-                // Mostra o e-mail logado e um botão de sair
-                document.getElementById('user-display').innerHTML = `Logado como: ${user.email} <button onclick="sairDoSistema()" class="text-rose-500 font-bold ml-2">Sair</button>`;
+                // Renderização do painel de usuário e logout redesenhados no header
+                userDisplay.innerHTML = `
+                    <div class="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                        <span class="text-xs font-medium text-stone-600 max-w-[120px] md:max-w-[180px] truncate">${user.email}</span>
+                    </div>
+                    <button onclick="sairDoSistema()" class="text-xs font-bold bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-200 shadow-sm">
+                        Sair
+                    </button>
+                `;
                 
                 startSync();
             } else {
-                // Ninguém logado. Esconde o loading e mostra a tela de login
                 currentUser = null;
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('login-screen').classList.remove('hidden');
+                userDisplay.innerHTML = '';
+                loadingScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
             }
         });
 
