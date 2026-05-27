@@ -215,7 +215,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // IMPORTAÇÕES ATUALIZADAS AQUI:
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Global Configs
@@ -231,7 +230,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider(); // NOVO: Provedor do Google
+        const provider = new GoogleAuthProvider(); // Provedor do Google
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Beatriz Pedreira", "Jonatan Santos", "Miguel Morelli"];
@@ -263,9 +262,6 @@
                 currentUser = null;
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
-            }
-        });
-                document.getElementById('loading').classList.add('hidden');
             }
         });
 
@@ -336,7 +332,6 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-stone-50 transition-colors";
                 
-                // Bug fix: Fallback values to prevent 'undefined'
                 const name = d.name || "";
                 const price = d.price || 0;
                 const obs = d.obs || "";
@@ -430,8 +425,6 @@
             document.querySelectorAll('nav button').forEach(b => { b.classList.remove('tab-active', 'text-teal-900'); b.classList.add('text-stone-500'); });
             document.getElementById(`tab-btn-${tabId}`).classList.add('tab-active', 'text-teal-900');
         };
-
-        init();
     </script>
 </body>
 </html>
