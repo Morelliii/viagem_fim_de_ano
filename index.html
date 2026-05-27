@@ -23,7 +23,7 @@
 <body class="min-h-screen pb-12">
     <div id="loading" class="loading-overlay font-bold text-teal-800 flex flex-col gap-4">
         <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
-        <span>A carregar planeamento...</span>
+        <span>Carregando planejamento...</span>
     </div>
 
     <div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
@@ -67,7 +67,7 @@
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
                         <p class="text-stone-600 leading-relaxed max-w-lg">
-                            Este é um quadro de trabalho para que possamos organizar a viagem de final de ano. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
+                            Este é o vosso espaço centralizado. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
                         </p>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
@@ -145,16 +145,16 @@
 
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Alimentação</h3>
-                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Item</button>
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Alimentação / Pratos</h3>
+                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Prato/Item</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead>
                                 <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                    <th class="py-3 px-4">Item</th>
-                                    <th class="py-3 px-4 text-center">Valor (R$)</th>
-                                    <th class="py-3 px-4 text-center">Status</th>
+                                    <th class="py-3 px-4">Item / Prato</th>
+                                    <th class="py-3 px-4 text-center w-28">Valor Total (R$)</th>
+                                    <th class="py-3 px-4 text-center w-28">Status Geral</th>
                                     <th class="py-3 px-4 text-right">Ação</th>
                                 </tr>
                             </thead>
@@ -225,6 +225,7 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
+        // AJUSTE: Grupo com 5 pessoas
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Jonatan Santos", "Miguel Morelli"];
         const months = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
@@ -248,7 +249,6 @@
                 loginScreen.classList.add('hidden');
                 loadingScreen.classList.add('hidden');
                 
-                // Renderização do painel de usuário e logout redesenhados no header
                 userDisplay.innerHTML = `
                     <div class="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl shadow-sm">
                         <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
@@ -321,6 +321,7 @@
             });
 
             document.getElementById('total-raised-display').innerText = `R$ ${total.toLocaleString('pt-BR')},00`;
+            // AJUSTE: Porcentagem baseada em 3600
             document.getElementById('pct-display').innerText = `${Math.round((total / 3600) * 100)}%`;
         }
 
@@ -340,6 +341,7 @@
                 const obs = d.obs || "";
                 const link = d.link || "";
                 const status = d.status || "Pendente";
+                const ingredients = d.ingredients || [];
 
                 if (d.type === 'airbnb') {
                     tr.innerHTML = `
@@ -356,8 +358,12 @@
                         <td class="py-4 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     busBody.appendChild(tr);
                 } else if (d.type === 'food') {
+                    // MUDANÇA: Renderização de Alimentação com Subcategorias/Ingredientes
                     tr.innerHTML = `
-                        <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-3 px-4">
+                            <input class="table-input font-bold text-stone-800" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
+                            <button onclick="addIngredient('${d.id}')" class="text-[10px] text-orange-600 font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>
+                        </td>
                         <td class="py-3 px-4 text-center"><input type="number" class="w-20 text-center font-bold text-teal-600" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
                         <td class="py-3 px-4 text-center">
                             <select onchange="updateLog('${d.id}', 'status', this.value)" class="text-[10px] p-1 rounded-full bg-stone-50">
@@ -367,6 +373,32 @@
                         </td>
                         <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     foodBody.appendChild(tr);
+
+                    // Se houver sub-ingredientes salvos, renderiza logo abaixo do prato
+                    if (ingredients.length > 0) {
+                        const subTr = document.createElement('tr');
+                        subTr.className = "bg-stone-50/60";
+                        let ingHtml = `
+                            <td colspan="4" class="px-8 py-2 border-b border-stone-100">
+                                <div class="space-y-2 my-1 border-l-2 border-orange-200 pl-4">
+                        `;
+                        
+                        ingredients.forEach(ing => {
+                            ingHtml += `
+                                <div class="flex items-center justify-between text-xs py-1">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" ${ing.bought ? 'checked' : ''} onchange="toggleIngredient('${d.id}', '${ing.id}', this.checked)" class="w-4 h-4 accent-teal-600 cursor-pointer">
+                                        <input class="bg-transparent font-medium text-stone-600 ${ing.bought ? 'line-through opacity-40' : ''}" value="${ing.name}" onblur="updateIngredientName('${d.id}', '${ing.id}', this.value)">
+                                    </div>
+                                    <button onclick="deleteIngredient('${d.id}', '${ing.id}')" class="text-stone-300 hover:text-red-500 text-[10px] font-bold">Remover</button>
+                                </div>
+                            `;
+                        });
+                        
+                        ingHtml += `</div></td>`;
+                        subTr.innerHTML = ingHtml;
+                        foodBody.appendChild(subTr);
+                    }
                 }
             });
         }
@@ -392,9 +424,54 @@
 
         // --- GLOBAL ACTIONS ---
         window.updateLog = async (id, f, v) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id), { [f]: f === 'price' ? parseFloat(v) || 0 : v }, { merge: true }); };
-        window.addLogEntry = async (t) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', `log_${Date.now()}`), { type: t, name: "Novo Item", price: 0, obs: "", link: "", status: "Pendente" }); };
+        window.addLogEntry = async (t) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', `log_${Date.now()}`), { type: t, name: "Novo Item", price: 0, obs: "", link: "", status: "Pendente", ingredients: [] }); };
         window.deleteLogEntry = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id)); };
         
+        // MUDANÇAS: Métodos específicos do Firestore para lidar com o Array de Ingredientes
+        window.addIngredient = async (dishId) => {
+            if (!currentUser) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                const ingredients = snap.data().ingredients || [];
+                ingredients.push({ id: `ing_${Date.now()}`, name: "Novo Ingrediente", bought: false });
+                await setDoc(ref, { ingredients }, { merge: true });
+            }
+        };
+
+        window.toggleIngredient = async (dishId, ingId, isChecked) => {
+            if (!currentUser) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                let ingredients = snap.data().ingredients || [];
+                ingredients = ingredients.map(ing => ing.id === ingId ? { ...ing, bought: isChecked } : ing);
+                await setDoc(ref, { ingredients }, { merge: true });
+            }
+        };
+
+        window.updateIngredientName = async (dishId, ingId, newName) => {
+            if (!currentUser) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                let ingredients = snap.data().ingredients || [];
+                ingredients = ingredients.map(ing => ing.id === ingId ? { ...ing, name: newName } : ing);
+                await setDoc(ref, { ingredients }, { merge: true });
+            }
+        };
+
+        window.deleteIngredient = async (dishId, ingId) => {
+            if (!currentUser) return;
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                let ingredients = snap.data().ingredients || [];
+                ingredients = ingredients.filter(ing => ing.id !== ingId);
+                await setDoc(ref, { ingredients }, { merge: true });
+            }
+        };
+
         window.togglePayment = async (p, m) => {
             if (!currentUser) return;
             const ref = doc(db, 'artifacts', appId, 'public', 'data', 'payments', p);
