@@ -67,7 +67,7 @@
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
                         <p class="text-stone-600 leading-relaxed max-w-lg">
-                            Este é o vosso space centralizado. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
+                            Este é um quadro de trabalho para que possamos organizar a viagem de final de ano. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
                         </p>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
@@ -95,7 +95,7 @@
                             <span class="text-[8px] uppercase opacity-70">Pago</span>
                         </div>
                     </div>
-                    <p class="text-xs opacity-80">Meta Total: R$ 4.320,00</p>
+                    <p class="text-xs opacity-80">Meta Total: R$ 3.600,00</p>
                     <p id="total-raised-display" class="text-xl font-black mt-2 text-teal-300 italic">R$ 0,00</p>
                 </div>
             </div>
@@ -225,7 +225,7 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
-        const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Beatriz Pedreira", "Jonatan Santos", "Miguel Morelli"];
+        const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Jonatan Santos", "Miguel Morelli"];
         const months = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
         let currentUser = null;
@@ -321,7 +321,7 @@
             });
 
             document.getElementById('total-raised-display').innerText = `R$ ${total.toLocaleString('pt-BR')},00`;
-            document.getElementById('pct-display').innerText = `${Math.round((total / 4320) * 100)}%`;
+            document.getElementById('pct-display').innerText = `${Math.round((total / 3600) * 100)}%`;
         }
 
         function renderLogistics(logs) {
@@ -417,7 +417,7 @@
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
-                data: { datasets: [{ data: [totalPaid, Math.max(0, 4320 - totalPaid)], backgroundColor: ['#2DD4BF', 'rgba(255,255,255,0.1)'], borderWidth: 0 }] },
+                data: { datasets: [{ data: [totalPaid, Math.max(0, 3600 - totalPaid)], backgroundColor: ['#2DD4BF', 'rgba(255,255,255,0.1)'], borderWidth: 0 }] },
                 options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false } }
             });
         }
