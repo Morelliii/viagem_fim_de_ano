@@ -21,11 +21,13 @@
     </style>
 </head>
 <body class="min-h-screen pb-12">
+    <!-- Overlay de Carregamento Inicial -->
     <div id="loading" class="loading-overlay font-bold text-teal-800 flex flex-col gap-4">
         <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
         <span>Carregando planejamento...</span>
     </div>
 
+    <!-- Tela de Autenticação -->
     <div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl custom-shadow text-center max-w-md w-full mx-4">
             <span class="text-6xl mb-4 block">🌴</span>
@@ -37,6 +39,7 @@
         </div>
     </div>
 
+    <!-- Cabeçalho Principal -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:grid md:grid-cols-3 items-center gap-4">
             
@@ -51,6 +54,8 @@
             <nav class="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto max-w-full justify-self-center">
                 <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="px-4 py-2 text-sm rounded-lg transition-all tab-active whitespace-nowrap">Resumo</button>
                 <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Logística</button>
+                <!-- NOVA ABA AQUI: -->
+                <button onclick="switchTab('mercado')" id="tab-btn-mercado" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Mercado</button>
                 <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Financeiro</button>
                 <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Itens para levar</button>
             </nav>
@@ -61,13 +66,14 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="md:col-span-2 glass-panel p-8 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
                         <p class="text-stone-600 leading-relaxed max-w-lg">
-                            Este é um quadro colaborativo para que possamos organizar a nossa viagem de final de ano. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
+                            Este é um quadro colaborativo para que possamos organizar nossa viagem de final de ano. Qualquer alteração feita nas tabelas de custos ou nos pagamentos será atualizada para todos em tempo real.
                         </p>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
@@ -101,6 +107,7 @@
             </div>
         </section>
 
+        <!-- SECTION: LOGÍSTICA (Agora apenas com Alojamento e Transporte) -->
         <section id="tab-logistica" class="hidden space-y-8">
             <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                 <div class="flex justify-between items-center mb-6">
@@ -123,38 +130,42 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
-                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-100">+ Adicionar</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                    <th class="py-3 px-4">Cia</th>
-                                    <th class="py-3 px-4 text-center">Valor (R$)</th>
-                                    <th class="py-3 px-4 text-right">Remover</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bus-table-body" class="divide-y divide-stone-50"></tbody>
-                        </table>
-                    </div>
+            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
+                    <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-100">+ Adicionar</button>
                 </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                <th class="py-3 px-4">Cia</th>
+                                <th class="py-3 px-4 text-center">Valor (R$)</th>
+                                <th class="py-3 px-4 text-right">Remover</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bus-table-body" class="divide-y divide-stone-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
+        <!-- NOVA SECTION: MERCADO -->
+        <section id="tab-mercado" class="hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Alimentação -->
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Alimentação / Pratos</h3>
-                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Prato/Item</button>
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
+                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Prato</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead>
                                 <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                    <th class="py-3 px-4">Item / Prato</th>
-                                    <th class="py-3 px-4 text-center w-28">Valor Total (R$)</th>
-                                    <th class="py-3 px-4 text-center w-28">Status Geral</th>
+                                    <th class="py-3 px-4">Prato</th>
+                                    <th class="py-3 px-4 text-center w-28">Total (R$)</th>
+                                    <th class="py-3 px-4 text-center w-28">Status</th>
                                     <th class="py-3 px-4 text-right">Ação</th>
                                 </tr>
                             </thead>
@@ -162,9 +173,31 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Bebidas -->
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
+                        <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-purple-50 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-100">+ Adicionar Bebida</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-4">Bebida</th>
+                                    <th class="py-3 px-4 text-center w-28">Total (R$)</th>
+                                    <th class="py-3 px-4 text-center w-28">Status</th>
+                                    <th class="py-3 px-4 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drinks-table-body" class="divide-y divide-stone-50"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </section>
 
+        <!-- SECTION: FINANCEIRO -->
         <section id="tab-financeiro" class="hidden space-y-6">
             <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100 overflow-x-auto">
                 <div class="mb-6">
@@ -184,6 +217,7 @@
             </div>
         </section>
 
+        <!-- SECTION: CHECKLIST -->
         <section id="tab-checklist" class="hidden space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
@@ -204,6 +238,7 @@
         </section>
     </main>
 
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -225,14 +260,12 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
-        // AJUSTE: Grupo com 5 pessoas
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Jonatan Santos", "Miguel Morelli"];
         const months = ["Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
         let currentUser = null;
         let chartInstance = null;
 
-        // --- INTERAÇÕES DE AUTENTICAÇÃO ---
         document.getElementById('btn-login-google').addEventListener('click', () => {
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
@@ -268,11 +301,9 @@
             }
         });
 
-        // --- REALTIME SYNC ---
         function startSync() {
             if (!currentUser) return;
 
-            // Payments Sync
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
                 const data = {};
                 snap.forEach(d => data[d.id] = d.data());
@@ -280,14 +311,12 @@
                 updateChart(data);
             });
 
-            // Logistics Sync
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
                 const logs = [];
                 snap.forEach(d => logs.push({ id: d.id, ...d.data() }));
                 renderLogistics(logs);
             });
 
-            // Checklist Sync
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
                 const checks = [];
                 snap.forEach(d => checks.push({ id: d.id, ...d.data() }));
@@ -295,7 +324,6 @@
             });
         }
 
-        // --- RENDER FUNCTIONS ---
         function renderPayments(data) {
             const body = document.getElementById('payments-table-body');
             body.innerHTML = "";
@@ -321,7 +349,6 @@
             });
 
             document.getElementById('total-raised-display').innerText = `R$ ${total.toLocaleString('pt-BR')},00`;
-            // AJUSTE: Porcentagem baseada em 3600
             document.getElementById('pct-display').innerText = `${Math.round((total / 3600) * 100)}%`;
         }
 
@@ -329,8 +356,9 @@
             const airBody = document.getElementById('airbnb-table-body');
             const busBody = document.getElementById('bus-table-body');
             const foodBody = document.getElementById('food-table-body');
+            const drinksBody = document.getElementById('drinks-table-body'); // Adicionado o corpo de bebidas
 
-            airBody.innerHTML = ""; busBody.innerHTML = ""; foodBody.innerHTML = "";
+            airBody.innerHTML = ""; busBody.innerHTML = ""; foodBody.innerHTML = ""; drinksBody.innerHTML = "";
 
             logs.forEach(d => {
                 const tr = document.createElement('tr');
@@ -357,12 +385,17 @@
                         <td class="py-4 px-4 text-center"><input type="number" class="w-20 text-center text-teal-600 font-bold" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
                         <td class="py-4 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     busBody.appendChild(tr);
-                } else if (d.type === 'food') {
-                    // MUDANÇA: Renderização de Alimentação com Subcategorias/Ingredientes
+                } else if (d.type === 'food' || d.type === 'drinks') {
+                    // Lógica compartilhada para Alimentos e Bebidas
+                    const isFood = d.type === 'food';
+                    const colorClass = isFood ? 'text-orange-600' : 'text-purple-600';
+                    const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
+                    const targetBody = isFood ? foodBody : drinksBody;
+
                     tr.innerHTML = `
                         <td class="py-3 px-4">
                             <input class="table-input font-bold text-stone-800" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
-                            <button onclick="addIngredient('${d.id}')" class="text-[10px] text-orange-600 font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>
+                            <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Item</button>
                         </td>
                         <td class="py-3 px-4 text-center"><input type="number" class="w-20 text-center font-bold text-teal-600" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
                         <td class="py-3 px-4 text-center">
@@ -372,15 +405,15 @@
                             </select>
                         </td>
                         <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
-                    foodBody.appendChild(tr);
+                    
+                    targetBody.appendChild(tr);
 
-                    // Se houver sub-ingredientes salvos, renderiza logo abaixo do prato
                     if (ingredients.length > 0) {
                         const subTr = document.createElement('tr');
                         subTr.className = "bg-stone-50/60";
                         let ingHtml = `
                             <td colspan="4" class="px-8 py-2 border-b border-stone-100">
-                                <div class="space-y-2 my-1 border-l-2 border-orange-200 pl-4">
+                                <div class="space-y-2 my-1 border-l-2 ${borderClass} pl-4">
                         `;
                         
                         ingredients.forEach(ing => {
@@ -397,7 +430,7 @@
                         
                         ingHtml += `</div></td>`;
                         subTr.innerHTML = ingHtml;
-                        foodBody.appendChild(subTr);
+                        targetBody.appendChild(subTr);
                     }
                 }
             });
@@ -427,7 +460,6 @@
         window.addLogEntry = async (t) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', `log_${Date.now()}`), { type: t, name: "Novo Item", price: 0, obs: "", link: "", status: "Pendente", ingredients: [] }); };
         window.deleteLogEntry = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id)); };
         
-        // MUDANÇAS: Métodos específicos do Firestore para lidar com o Array de Ingredientes
         window.addIngredient = async (dishId) => {
             if (!currentUser) return;
             const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
@@ -486,7 +518,6 @@
         window.updateCheckName = async (id, n) => { if (currentUser) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', id), { name: n }, { merge: true }); };
         window.deleteCheckItem = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'checklists', id)); };
 
-        // --- UI UTILS ---
         function updateChart(data) {
             let totalPaid = 0;
             Object.values(data).forEach(p => totalPaid += (p.paid ? p.paid.length : 1) * 80);
