@@ -25,7 +25,18 @@
         <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
         <span>A carregar planeamento...</span>
     </div>
-
+    
+<div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
+        <div class="bg-white p-10 rounded-3xl custom-shadow text-center max-w-md w-full mx-4">
+            <span class="text-6xl mb-4 block">🌴</span>
+            <h1 class="text-3xl font-extrabold text-teal-900 mb-2">Monte Gordo 2026</h1>
+            <p class="text-stone-500 mb-8 text-sm">Faça login com sua conta Google para acessar o planejamento do grupo.</p>
+            <button id="btn-login-google" class="w-full bg-teal-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-teal-700 transition-colors shadow-lg flex items-center justify-center gap-3">
+                Entrar com o Google
+            </button>
+        </div>
+    </div>
+    
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -204,7 +215,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // IMPORTAÇÕES ATUALIZADAS AQUI:
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Global Configs
         const firebaseConfig = {
@@ -215,9 +227,11 @@
             messagingSenderId: "949507681367",
             appId: "1:949507681367:web:d7c7b468d90bd1106a8712"
         };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const provider = new GoogleAuthProvider(); // NOVO: Provedor do Google
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Beatriz Pedreira", "Jonatan Santos", "Miguel Morelli"];
@@ -226,22 +240,31 @@
         let currentUser = null;
         let chartInstance = null;
 
-        // --- AUTH & INIT ---
-        async function init() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) { console.error("Erro Auth:", err); }
-        }
+        // --- NOVA LÓGICA DE AUTH ---
+        document.getElementById('btn-login-google').addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
+        });
+
+        window.sairDoSistema = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Usuário logado! Esconde a tela de login e mostra o conteúdo
                 currentUser = user;
-                document.getElementById('user-display').innerText = `Ligado como: ${user.uid.substring(0,8)}`;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                
+                // Mostra o e-mail logado e um botão de sair
+                document.getElementById('user-display').innerHTML = `Logado como: ${user.email} <button onclick="sairDoSistema()" class="text-rose-500 font-bold ml-2">Sair</button>`;
+                
                 startSync();
+            } else {
+                // Ninguém logado. Esconde o loading e mostra a tela de login
+                currentUser = null;
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        });
                 document.getElementById('loading').classList.add('hidden');
             }
         });
