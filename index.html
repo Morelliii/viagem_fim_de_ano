@@ -10,7 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         :root { --bg-color: #FDFBFA; --primary: #0D9488; --secondary: #F43F5E; --accent: #EAB308; --stone-900: #1C1917; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); color: var(--stone-900); }
-        .tab-active { color: var(--primary); border-bottom: 3px solid var(--primary); font-weight: 700; }
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(229, 231, 235, 0.5); }
         .custom-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
         input:focus, select:focus { outline: none; border-bottom: 2px solid var(--primary); }
@@ -39,27 +38,43 @@
         </div>
     </div>
 
+    <!-- Menu Lateral (Drawer) -->
+    <div id="mobile-menu" class="fixed inset-y-0 left-0 w-72 bg-white z-[10000] transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-stone-100">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🌴</span>
+                <h2 class="font-extrabold text-xl text-teal-900">Menu</h2>
+            </div>
+            <button onclick="toggleMenu()" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">✕</button>
+        </div>
+        <nav class="flex flex-col p-4 gap-2">
+            <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="text-left px-4 py-3 rounded-xl font-bold text-teal-900 bg-teal-50 transition-all tab-btn">Resumo</button>
+            <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Logística</button>
+            <button onclick="switchTab('mercado')" id="tab-btn-mercado" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Mercado</button>
+            <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Financeiro</button>
+            <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Itens para levar</button>
+        </nav>
+    </div>
+    
+    <!-- Overlay Escuro do Menu -->
+    <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-stone-900/50 z-[9999] hidden opacity-0 transition-opacity duration-300"></div>
+
     <!-- Cabeçalho Principal -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:grid md:grid-cols-3 items-center gap-4">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
             
-            <div class="flex items-center gap-3 justify-self-center md:justify-self-start">
-                <span class="text-3xl">🌴</span>
-                <div>
-                    <h1 class="text-2xl font-extrabold tracking-tight text-teal-900">Monte Gordo 2026</h1>
-                    <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest">Dashboard Colaborativo</p>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMenu()" class="text-2xl p-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-teal-900 transition-colors shadow-sm">☰</button>
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl hidden sm:block">🌴</span>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-teal-900">Monte Gordo 2026</h1>
+                        <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest hidden sm:block">Dashboard Colaborativo</p>
+                    </div>
                 </div>
             </div>
             
-            <nav class="flex gap-1 bg-stone-100 p-1 rounded-xl overflow-x-auto max-w-full justify-self-center">
-                <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="px-4 py-2 text-sm rounded-lg transition-all tab-active whitespace-nowrap">Resumo</button>
-                <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Logística</button>
-                <button onclick="switchTab('mercado')" id="tab-btn-mercado" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Mercado</button>
-                <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Financeiro</button>
-                <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="px-4 py-2 text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900 whitespace-nowrap">Itens para levar</button>
-            </nav>
-            
-            <div id="user-display" class="justify-self-center md:justify-self-end flex items-center gap-3"></div>
+            <div id="user-display" class="flex items-center gap-3"></div>
             
         </div>
     </header>
@@ -68,7 +83,7 @@
         <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Coluna Principal (Boas Vindas + Datas) -->
+                <!-- Coluna Principal -->
                 <div class="md:col-span-2 glass-panel p-8 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
@@ -108,7 +123,7 @@
                         <p id="total-raised-display" class="text-lg font-black mt-1 text-teal-300 italic">R$ 0,00</p>
                     </div>
 
-                    <!-- Total de Gastos Planejados (NOVO) -->
+                    <!-- Total de Gastos Planejados -->
                     <div class="bg-rose-900 text-white p-6 rounded-3xl shadow-xl flex flex-col items-center text-center flex-1 justify-center">
                         <h3 class="text-md font-bold mb-3">Total de Gastos</h3>
                         <div class="relative w-28 h-28 mb-3">
@@ -284,13 +299,12 @@
         </section>
     </main>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs & Lógica -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Global Configs
         const firebaseConfig = {
             apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o",
             authDomain: "viagemfimdeano2026.firebaseapp.com",
@@ -311,8 +325,48 @@
 
         let currentUser = null;
         let chartInstance = null;
-        let expensesChartInstance = null; // Nova instância para o gráfico de gastos
+        let expensesChartInstance = null;
 
+        // --- SISTEMA DE MENU ---
+        window.toggleMenu = () => {
+            const menu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('menu-overlay');
+            
+            if (menu.classList.contains('-translate-x-full')) {
+                menu.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                menu.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        };
+
+        window.switchTab = (tabId) => {
+            // Esconde e mostra os blocos
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            // Gerencia os estilos visuais dos botões do menu lateral
+            document.querySelectorAll('.tab-btn').forEach(b => { 
+                b.classList.remove('text-teal-900', 'bg-teal-50'); 
+                b.classList.add('text-stone-500'); 
+            });
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-stone-500');
+                activeBtn.classList.add('text-teal-900', 'bg-teal-50');
+            }
+
+            // Fecha o menu lateral automaticamente
+            const menu = document.getElementById('mobile-menu');
+            if (!menu.classList.contains('-translate-x-full')) {
+                window.toggleMenu();
+            }
+        };
+
+        // --- AUTENTICAÇÃO ---
         document.getElementById('btn-login-google').addEventListener('click', () => {
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
@@ -332,7 +386,7 @@
                 userDisplay.innerHTML = `
                     <div class="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl shadow-sm">
                         <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                        <span class="text-xs font-medium text-stone-600 max-w-[120px] md:max-w-[180px] truncate">${user.email}</span>
+                        <span class="text-xs font-medium text-stone-600 max-w-[120px] md:max-w-[180px] truncate hidden sm:block">${user.email}</span>
                     </div>
                     <button onclick="sairDoSistema()" class="text-xs font-bold bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-200 shadow-sm">
                         Sair
@@ -348,6 +402,7 @@
             }
         });
 
+        // --- SYNC ---
         function startSync() {
             if (!currentUser) return;
 
@@ -371,6 +426,7 @@
             });
         }
 
+        // --- RENDER FUNCTIONS ---
         function renderPayments(data) {
             const body = document.getElementById('payments-table-body');
             body.innerHTML = "";
@@ -407,7 +463,6 @@
 
             airBody.innerHTML = ""; busBody.innerHTML = ""; foodBody.innerHTML = ""; drinksBody.innerHTML = "";
 
-            // Variáveis de somatório
             let totalAirbnb = 0;
             let totalBus = 0;
             let totalFood = 0;
@@ -426,7 +481,6 @@
                 const status = d.status || "Pendente";
                 const ingredients = d.ingredients || [];
 
-                // Somando os valores nas respectivas categorias
                 if (d.type === 'airbnb') totalAirbnb += price;
                 else if (d.type === 'bus') totalBus += price;
                 else if (d.type === 'food') totalFood += price;
@@ -452,10 +506,11 @@
                     const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
                     const targetBody = isFood ? foodBody : drinksBody;
 
+                    // MUDANÇA: O botão aqui foi atualizado para "+ Adicionar Ingrediente"
                     tr.innerHTML = `
                         <td class="py-3 px-4 w-full min-w-[200px]">
                             <input class="table-input font-bold text-stone-800 w-full" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
-                            <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Item</button>
+                            <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>
                         </td>
                         <td class="py-3 px-2 text-center">
                             <div class="flex items-center justify-center gap-1">
@@ -518,16 +573,13 @@
                 }
             });
 
-            // Formatador de Moeda BR
             const formatBRL = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            // Atualiza os rodapés das tabelas
             document.getElementById('airbnb-total').innerText = formatBRL(totalAirbnb);
             document.getElementById('bus-total').innerText = formatBRL(totalBus);
             document.getElementById('food-total').innerText = formatBRL(totalFood);
             document.getElementById('drinks-total').innerText = formatBRL(totalDrinks);
 
-            // Chama a função para desenhar o gráfico vermelho de despesas
             const totalGeralGastos = totalAirbnb + totalBus + totalFood + totalDrinks;
             updateExpensesChart(totalGeralGastos);
         }
@@ -644,11 +696,9 @@
             const budget = 3600;
             const pct = Math.round((totalExpenses / budget) * 100);
             
-            // Atualiza os textos
             document.getElementById('total-expenses-display').innerText = totalExpenses.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('expenses-pct-display').innerText = `${pct}%`;
 
-            // Desenha o gráfico vermelho (Rose)
             expensesChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: { datasets: [{ 
@@ -660,12 +710,6 @@
             });
         }
 
-        window.switchTab = (tabId) => {
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => { b.classList.remove('tab-active', 'text-teal-900'); b.classList.add('text-stone-500'); });
-            document.getElementById(`tab-btn-${tabId}`).classList.add('tab-active', 'text-teal-900');
-        };
     </script>
 </body>
 </html>
