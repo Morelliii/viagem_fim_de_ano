@@ -20,13 +20,11 @@
     </style>
 </head>
 <body class="min-h-screen pb-12">
-    <!-- Overlay de Carregamento Inicial -->
     <div id="loading" class="loading-overlay font-bold text-teal-800 flex flex-col gap-4">
         <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
         <span>Carregando planejamento...</span>
     </div>
 
-    <!-- Tela de Autenticação -->
     <div id="login-screen" class="fixed inset-0 bg-stone-100 z-[9999] flex flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl custom-shadow text-center max-w-md w-full mx-4">
             <span class="text-6xl mb-4 block">🌴</span>
@@ -56,13 +54,10 @@
         </nav>
     </div>
     
-    <!-- Overlay Escuro do Menu -->
     <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-stone-900/50 z-[9999] hidden opacity-0 transition-opacity duration-300"></div>
 
-    <!-- Cabeçalho Principal -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
-            
             <div class="flex items-center gap-4">
                 <button onclick="toggleMenu()" class="text-2xl p-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-teal-900 transition-colors shadow-sm">☰</button>
                 <div class="flex items-center gap-3">
@@ -73,9 +68,7 @@
                     </div>
                 </div>
             </div>
-            
             <div id="user-display" class="flex items-center gap-3"></div>
-            
         </div>
     </header>
 
@@ -83,7 +76,6 @@
         <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Coluna Principal -->
                 <div class="md:col-span-2 glass-panel p-8 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-3xl font-extrabold text-stone-900 mb-4">Olá, grupo! 👋</h2>
@@ -107,9 +99,7 @@
                     </div>
                 </div>
 
-                <!-- Coluna Lateral (Dashboard de Fundos e Gastos) -->
                 <div class="flex flex-col gap-6">
-                    <!-- Fundo Arrecadado -->
                     <div class="bg-teal-900 text-white p-6 rounded-3xl shadow-xl flex flex-col items-center text-center flex-1 justify-center">
                         <h3 class="text-md font-bold mb-3">Progresso do Fundo</h3>
                         <div class="relative w-28 h-28 mb-3">
@@ -123,7 +113,6 @@
                         <p id="total-raised-display" class="text-lg font-black mt-1 text-teal-300 italic">R$ 0,00</p>
                     </div>
 
-                    <!-- Total de Gastos Planejados -->
                     <div class="bg-rose-900 text-white p-6 rounded-3xl shadow-xl flex flex-col items-center text-center flex-1 justify-center">
                         <h3 class="text-md font-bold mb-3">Total de Gastos</h3>
                         <div class="relative w-28 h-28 mb-3">
@@ -151,19 +140,20 @@
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-4">Airbnb</th>
-                                <th class="py-3 px-4">Obs / Detalhes</th>
-                                <th class="py-3 px-4 text-center w-32">Valor (R$)</th>
-                                <th class="py-3 px-4 text-center">Link</th>
+                                <th class="py-3 px-2 text-center" title="Opção Escolhida">✓</th>
+                                <th class="py-3 px-4 min-w-[150px]">Airbnb</th>
+                                <th class="py-3 px-4 min-w-[150px]">Obs / Detalhes</th>
+                                <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
+                                <th class="py-3 px-4 min-w-[180px]">Link</th>
                                 <th class="py-3 px-4 text-right">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="airbnb-table-body" class="divide-y divide-stone-50"></tbody>
                         <tfoot class="bg-stone-50/50 border-t border-stone-100">
                             <tr>
-                                <td colspan="2" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Alojamento:</td>
+                                <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Alojamento:</td>
                                 <td id="airbnb-total" class="py-4 px-4 text-center font-black text-rose-600">R$ 0,00</td>
-                                <td colspan="2"></td>
+                                <td colspan="2"><span class="text-[10px] text-stone-400 font-medium ml-2">(Soma apenas a opção marcada)</span></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -179,8 +169,9 @@
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-4">Cia</th>
-                                <th class="py-3 px-4 text-center">Valor (R$)</th>
+                                <th class="py-3 px-4 min-w-[150px]">Cia</th>
+                                <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
+                                <th class="py-3 px-4 min-w-[180px]">Link</th>
                                 <th class="py-3 px-4 text-right">Remover</th>
                             </tr>
                         </thead>
@@ -189,7 +180,7 @@
                             <tr>
                                 <td class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Transportes:</td>
                                 <td id="bus-total" class="py-4 px-4 text-center font-black text-blue-600">R$ 0,00</td>
-                                <td></td>
+                                <td colspan="2"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -326,6 +317,7 @@
         let currentUser = null;
         let chartInstance = null;
         let expensesChartInstance = null;
+        let currentLogs = []; // Variável global para armazenar a logística
 
         // --- SISTEMA DE MENU ---
         window.toggleMenu = () => {
@@ -344,11 +336,9 @@
         };
 
         window.switchTab = (tabId) => {
-            // Esconde e mostra os blocos
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             
-            // Gerencia os estilos visuais dos botões do menu lateral
             document.querySelectorAll('.tab-btn').forEach(b => { 
                 b.classList.remove('text-teal-900', 'bg-teal-50'); 
                 b.classList.add('text-stone-500'); 
@@ -359,7 +349,6 @@
                 activeBtn.classList.add('text-teal-900', 'bg-teal-50');
             }
 
-            // Fecha o menu lateral automaticamente
             const menu = document.getElementById('mobile-menu');
             if (!menu.classList.contains('-translate-x-full')) {
                 window.toggleMenu();
@@ -414,9 +403,9 @@
             });
 
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
-                const logs = [];
-                snap.forEach(d => logs.push({ id: d.id, ...d.data() }));
-                renderLogistics(logs);
+                currentLogs = [];
+                snap.forEach(d => currentLogs.push({ id: d.id, ...d.data() }));
+                renderLogistics(currentLogs);
             });
 
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
@@ -480,24 +469,43 @@
                 const link = d.link || "";
                 const status = d.status || "Pendente";
                 const ingredients = d.ingredients || [];
+                const isSelectedAirbnb = d.selected === true;
 
-                if (d.type === 'airbnb') totalAirbnb += price;
+                // O Airbnb só soma se a caixinha estiver marcada como escolhida
+                if (d.type === 'airbnb' && isSelectedAirbnb) totalAirbnb += price;
                 else if (d.type === 'bus') totalBus += price;
                 else if (d.type === 'food') totalFood += price;
                 else if (d.type === 'drinks') totalDrinks += price;
 
+                // Formatação do link para gerar o ícone clicável
+                const linkIcon = link ? `<a href="${link.startsWith('http') ? link : 'https://'+link}" target="_blank" title="Abrir site" class="text-lg hover:scale-110 transition-transform ml-1">🔗</a>` : '';
+
                 if (d.type === 'airbnb') {
                     tr.innerHTML = `
+                        <td class="py-3 px-2 text-center">
+                            <input type="checkbox" class="w-4 h-4 accent-rose-600 cursor-pointer" ${isSelectedAirbnb ? 'checked' : ''} onchange="selectAirbnb('${d.id}', this.checked)">
+                        </td>
                         <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
                         <td class="py-3 px-4"><input class="table-input text-xs text-stone-500" value="${obs}" onblur="updateLog('${d.id}', 'obs', this.value)"></td>
                         <td class="py-3 px-4 text-center"><input type="number" class="w-24 text-center font-bold text-teal-600" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
-                        <td class="py-3 px-4 text-center"><input class="table-input text-[10px] text-teal-600 text-center" value="${link}" placeholder="Link" onblur="updateLog('${d.id}', 'link', this.value)"></td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center min-w-[150px]">
+                                <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
+                                ${linkIcon}
+                            </div>
+                        </td>
                         <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     airBody.appendChild(tr);
                 } else if (d.type === 'bus') {
                     tr.innerHTML = `
                         <td class="py-4 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
                         <td class="py-4 px-4 text-center"><input type="number" class="w-20 text-center text-teal-600 font-bold" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center min-w-[150px]">
+                                <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
+                                ${linkIcon}
+                            </div>
+                        </td>
                         <td class="py-4 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     busBody.appendChild(tr);
                 } else if (d.type === 'food' || d.type === 'drinks') {
@@ -506,7 +514,6 @@
                     const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
                     const targetBody = isFood ? foodBody : drinksBody;
 
-                    // MUDANÇA: O botão aqui foi atualizado para "+ Adicionar Ingrediente"
                     tr.innerHTML = `
                         <td class="py-3 px-4 w-full min-w-[200px]">
                             <input class="table-input font-bold text-stone-800 w-full" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
@@ -622,6 +629,18 @@
 
         window.deleteLogEntry = async (id) => { if (currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id)); };
         
+        // NOVO: Função para selecionar qual Airbnb será somado no cálculo
+        window.selectAirbnb = async (chosenId, isChecking) => {
+            if (!currentUser) return;
+            const airbnbs = currentLogs.filter(l => l.type === 'airbnb');
+            for (const item of airbnbs) {
+                const newState = (item.id === chosenId) ? isChecking : false;
+                if (item.selected !== newState) {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', item.id), { selected: newState }, { merge: true });
+                }
+            }
+        };
+
         window.updateIngField = async (dishId, ingId, field, value) => {
             if (!currentUser) return;
             const ref = doc(db, 'artifacts', appId, 'public', 'data', 'logistics', dishId);
