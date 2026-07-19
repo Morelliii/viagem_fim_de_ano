@@ -76,10 +76,10 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-        <!-- SECTION: RESUMO (NOVO DESIGN COMPACTO COM MINI-GRÁFICOS) -->
+        <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                <!-- Cartão de Boas-Vindas Enxuto -->
+                <!-- Cartão de Boas-Vindas -->
                 <div class="lg:col-span-6 glass-panel p-5 sm:p-6 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-2xl font-extrabold text-stone-900 mb-2">Olá, grupo! 👋</h2>
@@ -635,11 +635,12 @@
                         <td class="py-3 px-4 text-center align-top pt-4">
                             ${ingredients.length > 0 
                                 ? `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${dishTotal.toFixed(2)}</div>` 
-                                : `<div class="flex flex-col items-center">
-                                       <div class="flex items-center justify-center border-b border-transparent hover:border-stone-200 transition-colors">
-                                           <span class="text-[10px] text-stone-400 font-bold mr-1">R$</span>
-                                           <input type="number" class="w-16 text-center font-bold text-teal-600 bg-transparent outline-none px-1" value="${price || ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
+                                : `<div class="flex flex-col items-center gap-1.5">
+                                       <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[80px] shadow-sm">
+                                           <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                           <input type="number" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price || ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
                                        </div>
+                                       ${showTotalPrincipal ? `<div class="text-[9px] text-teal-700 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100 whitespace-nowrap">Total: R$ ${valorCalculadoPrincipal.toFixed(2)}</div>` : ''}
                                    </div>`
                             }
                         </td>
@@ -652,19 +653,6 @@
                         <td class="py-3 px-4 text-right align-top pt-4"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     
                     targetBody.appendChild(tr);
-
-                    if (ingredients.length === 0 && showTotalPrincipal) {
-                        const totalTr = document.createElement('tr');
-                        totalTr.className = "bg-stone-50/20";
-                        totalTr.innerHTML = `
-                            <td colspan="5" class="px-4 py-1.5 border-b border-stone-100">
-                                <div class="w-full text-[10px] text-teal-700 font-bold text-right pr-[85px] sm:pr-[155px]">
-                                    Subtotal: R$ ${valorCalculadoPrincipal.toFixed(2)}
-                                </div>
-                            </td>
-                        `;
-                        targetBody.appendChild(totalTr);
-                    }
 
                     if (ingredients.length > 0) {
                         const subTr = document.createElement('tr');
