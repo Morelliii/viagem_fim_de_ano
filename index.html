@@ -172,7 +172,7 @@
                                 <th class="py-3 px-2 text-center" title="Opção Escolhida">✓</th>
                                 <th class="py-3 px-4 min-w-[150px]">Airbnb</th>
                                 <th class="py-3 px-4 min-w-[150px]">Obs / Detalhes</th>
-                                <th class="py-3 px-4 text-center w-32">Valor (R$)</th>
+                                <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
                                 <th class="py-3 px-4 min-w-[180px]">Link</th>
                                 <th class="py-3 px-4 text-right">Ação</th>
                             </tr>
@@ -199,7 +199,7 @@
                         <thead>
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 min-w-[150px]">Cia / Rota</th>
-                                <th class="py-3 px-2 text-center w-28">Tarifa (R$)</th>
+                                <th class="py-3 px-2 text-center w-24">Tarifa (R$)</th>
                                 <th class="py-3 px-2 text-center w-16" title="Quantidade de Pessoas">Qtd</th>
                                 <th class="py-3 px-2 text-center w-20">Ida/Volta</th>
                                 <th class="py-3 px-4 text-center w-28">Total (R$)</th>
@@ -234,7 +234,7 @@
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 w-full">Prato / Item</th>
                                 <th class="py-3 px-2 text-center w-28 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
+                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor (R$)</th>
                                 <th class="py-3 px-4 text-center w-24 whitespace-nowrap">Status</th>
                                 <th class="py-3 px-4 text-right whitespace-nowrap">Ação</th>
                             </tr>
@@ -263,7 +263,7 @@
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 w-full">Bebida</th>
                                 <th class="py-3 px-2 text-center w-28 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
+                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor (R$)</th>
                                 <th class="py-3 px-4 text-center w-24 whitespace-nowrap">Status</th>
                                 <th class="py-3 px-4 text-right whitespace-nowrap">Ação</th>
                             </tr>
@@ -453,6 +453,7 @@
         }
 
         // --- LÓGICA DE CÁLCULO E FORMATAÇÃO ---
+        
         window.formatMoeda = (val) => {
             return (val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         };
@@ -631,6 +632,9 @@
                            <option value="L" ${unit === 'L' ? 'selected' : ''}>L</option>`
                         : `<option value="un" ${unit === 'un' ? 'selected' : ''}>un</option>
                            <option value="L" ${unit === 'L' ? 'selected' : ''}>L</option>
+                           <option value="lata" ${unit === 'lata' ? 'selected' : ''}>lata</option>
+                           <option value="kg" ${unit === 'kg' ? 'selected' : ''}>kg</option>
+                           <option value="g" ${unit === 'g' ? 'selected' : ''}>g</option>
                            <option value="pack (6)" ${unit === 'pack (6)' ? 'selected' : ''}>pack (6)</option>
                            <option value="pack (12)" ${unit === 'pack (12)' ? 'selected' : ''}>pack (12)</option>
                            <option value="pack (15)" ${unit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
@@ -645,12 +649,44 @@
                     
                     const showTotalPrincipal = (amount !== 1 || ehPorPesoPrincipal) && price > 0 && ingredients.length === 0;
 
+                    let priceCellHtml = '';
+                    if (ingredients.length > 0) {
+                        priceCellHtml = `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${window.formatMoeda(dishTotal)}</div>`;
+                    } else {
+                        if (showTotalPrincipal) {
+                            priceCellHtml = `
+                                <div class="flex items-center justify-center gap-3">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-[9px] font-bold text-stone-500 uppercase">Preço:</span>
+                                        <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
+                                            <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                            <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1 bg-teal-50 px-2 py-1 rounded border border-teal-100">
+                                        <span class="text-[9px] font-bold text-teal-600 uppercase">Total:</span>
+                                        <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculadoPrincipal)}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            priceCellHtml = `
+                                <div class="flex items-center justify-center">
+                                    <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
+                                        <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                        <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+
                     tr.innerHTML = `
-                        <td class="py-3 px-4 w-full min-w-[200px] align-top">
+                        <td class="py-3 px-4 w-full min-w-[200px] align-middle">
                             <input class="table-input font-bold text-stone-800 w-full" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
                             <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>
                         </td>
-                        <td class="py-3 px-2 text-center align-top pt-4">
+                        <td class="py-3 px-2 text-center align-middle">
                             <div class="flex items-center justify-center gap-1">
                                 <input type="number" class="w-10 text-center font-bold text-stone-600 table-input px-1" value="${amount}" onblur="updateLog('${d.id}', 'amount', this.value)">
                                 <select onchange="updateLog('${d.id}', 'unit', this.value)" class="text-[10px] p-1 rounded-md bg-stone-100 text-stone-600 outline-none cursor-pointer border border-stone-200">
@@ -658,32 +694,16 @@
                                 </select>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-center align-top pt-4 min-w-[250px]">
-                            ${ingredients.length > 0 
-                                ? `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${window.formatMoeda(dishTotal)}</div>` 
-                                : `<div class="flex items-center justify-center gap-3">
-                                       <div class="flex items-center gap-1">
-                                           <span class="text-[9px] font-bold text-stone-500 uppercase">Preço:</span>
-                                           <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
-                                               <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
-                                               <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
-                                           </div>
-                                       </div>
-                                       ${showTotalPrincipal ? `
-                                       <div class="flex items-center gap-1 bg-teal-50 px-2 py-1 rounded border border-teal-100">
-                                           <span class="text-[9px] font-bold text-teal-600 uppercase">Total:</span>
-                                           <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculadoPrincipal)}</span>
-                                       </div>` : ''}
-                                   </div>`
-                            }
+                        <td class="py-3 px-4 text-center min-w-[200px] align-middle whitespace-nowrap">
+                            ${priceCellHtml}
                         </td>
-                        <td class="py-3 px-4 text-center align-top pt-4">
+                        <td class="py-3 px-4 text-center align-middle">
                             <select onchange="updateLog('${d.id}', 'status', this.value)" class="text-[10px] p-1 rounded-full bg-stone-50">
                                 <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                                 <option value="Comprado" ${status === 'Comprado' ? 'selected' : ''}>Comprado</option>
                             </select>
                         </td>
-                        <td class="py-3 px-4 text-right align-top pt-4"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                        <td class="py-3 px-4 text-right align-middle"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
                     
                     targetBody.appendChild(tr);
 
@@ -692,7 +712,7 @@
                         subTr.className = "bg-stone-50/60";
                         const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
                         let ingHtml = `<td colspan="5" class="px-2 sm:px-8 py-2 border-b border-stone-100">
-                                       <div class="space-y-2 my-1 border-l-2 ${borderClass} pl-4">`;
+                                       <div class="space-y-1 my-1 border-l-2 ${borderClass} pl-4">`;
                         
                         ingredients.forEach(ing => {
                             const ingAmount = ing.amount || 1;
@@ -711,7 +731,7 @@
                             
                             const showTotal = (ingAmount !== 1 || ehPorPeso) && ingPrice > 0;
                             const labelCalculo = showTotal 
-                                ? `<div class="w-full text-[9px] text-teal-700 font-bold px-[30px] sm:px-[140px] pb-2 mt-[-4px]">Subtotal: R$ ${window.formatMoeda(valorCalculado)}</div>`
+                                ? `<span class="text-[10px] text-teal-700 font-bold ml-3 whitespace-nowrap">= R$ ${window.formatMoeda(valorCalculado)}</span>`
                                 : '';
 
                             const ingUnitOptions = isFood 
@@ -723,33 +743,33 @@
                                    <option value="L" ${ingUnit === 'L' ? 'selected' : ''}>L</option>`
                                 : `<option value="un" ${ingUnit === 'un' ? 'selected' : ''}>un</option>
                                    <option value="L" ${ingUnit === 'L' ? 'selected' : ''}>L</option>
+                                   <option value="lata" ${ingUnit === 'lata' ? 'selected' : ''}>lata</option>
+                                   <option value="kg" ${ingUnit === 'kg' ? 'selected' : ''}>kg</option>
+                                   <option value="g" ${ingUnit === 'g' ? 'selected' : ''}>g</option>
                                    <option value="pack (6)" ${ingUnit === 'pack (6)' ? 'selected' : ''}>pack (6)</option>
                                    <option value="pack (12)" ${ingUnit === 'pack (12)' ? 'selected' : ''}>pack (12)</option>
                                    <option value="pack (15)" ${ingUnit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
                                    <option value="pack (24)" ${ingUnit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
                             ingHtml += `
-                                <div class="flex flex-col border-b border-stone-100/50 last:border-0 group">
-                                    <div class="flex items-center justify-between text-xs py-1.5 flex-wrap sm:flex-nowrap gap-2">
-                                        <div class="flex items-center gap-2 flex-1 w-full mr-2">
-                                            <input type="checkbox" ${ing.bought ? 'checked' : ''} onchange="updateIngField('${d.id}', '${ing.id}', 'bought', this.checked)" class="w-4 h-4 accent-teal-600 cursor-pointer flex-shrink-0">
-                                            <input class="bg-transparent font-medium text-stone-600 w-full min-w-[120px] ${ing.bought ? 'line-through opacity-40' : ''} focus:outline-none focus:border-b focus:border-teal-300" value="${ing.name}" onblur="updateIngField('${d.id}', '${ing.id}', 'name', this.value)">
-                                        </div>
-                                        <div class="flex items-center opacity-100 sm:opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                            <input type="number" class="w-10 text-center font-medium text-stone-600 bg-white border border-stone-200 rounded-l px-1 py-1 text-[11px] focus:outline-none" value="${ingAmount}" onblur="updateIngField('${d.id}', '${ing.id}', 'amount', this.value)">
-                                            <select onchange="updateIngField('${d.id}', '${ing.id}', 'unit', this.value)" class="text-[10px] p-1 py-1.5 rounded-r bg-stone-100 text-stone-600 border border-stone-200 focus:outline-none cursor-pointer">
-                                                ${ingUnitOptions}
-                                            </select>
-                                            
-                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1 py-0.5 ml-2 w-[85px] shadow-sm">
-                                                <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
-                                                <input type="text" inputmode="decimal" class="w-full font-medium text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${ingPrice > 0 ? window.formatMoeda(ingPrice) : ''}" placeholder="${placeholderText}" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
-                                            </div>
-                                            
-                                            <button onclick="deleteIngredient('${d.id}', '${ing.id}')" class="text-stone-300 hover:text-red-500 text-[10px] font-bold bg-stone-50 px-2 py-1.5 rounded ml-2">❌</button>
-                                        </div>
+                                <div class="flex items-center justify-between text-xs py-1.5 flex-wrap sm:flex-nowrap gap-2 border-b border-stone-100/50 last:border-0 group">
+                                    <div class="flex items-center gap-2 flex-1 w-full mr-2">
+                                        <input type="checkbox" ${ing.bought ? 'checked' : ''} onchange="updateIngField('${d.id}', '${ing.id}', 'bought', this.checked)" class="w-4 h-4 accent-teal-600 cursor-pointer flex-shrink-0">
+                                        <input class="bg-transparent font-medium text-stone-600 w-full min-w-[120px] ${ing.bought ? 'line-through opacity-40' : ''} focus:outline-none focus:border-b focus:border-teal-300" value="${ing.name}" onblur="updateIngField('${d.id}', '${ing.id}', 'name', this.value)">
                                     </div>
-                                    ${labelCalculo}
+                                    <div class="flex items-center opacity-100 sm:opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                        <input type="number" class="w-10 text-center font-medium text-stone-600 bg-white border border-stone-200 rounded-l px-1 py-1 text-[11px] focus:outline-none" value="${ingAmount}" onblur="updateIngField('${d.id}', '${ing.id}', 'amount', this.value)">
+                                        <select onchange="updateIngField('${d.id}', '${ing.id}', 'unit', this.value)" class="text-[10px] p-1 py-1.5 rounded-r bg-stone-100 text-stone-600 border border-stone-200 focus:outline-none cursor-pointer">
+                                            ${ingUnitOptions}
+                                        </select>
+                                        
+                                        <div class="flex items-center bg-white border border-stone-200 rounded px-1 py-0.5 ml-2 w-[75px]">
+                                            <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                            <input type="text" inputmode="decimal" class="w-full font-medium text-teal-600 text-[11px] focus:outline-none text-right" value="${ingPrice > 0 ? window.formatMoeda(ingPrice) : ''}" placeholder="${placeholderText}" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
+                                        </div>
+                                        ${labelCalculo}
+                                        <button onclick="deleteIngredient('${d.id}', '${ing.id}')" class="text-stone-300 hover:text-red-500 text-[10px] font-bold bg-stone-50 px-2 py-1.5 rounded ml-3">❌</button>
+                                    </div>
                                 </div>
                             `;
                         });
