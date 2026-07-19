@@ -172,7 +172,7 @@
                                 <th class="py-3 px-2 text-center" title="Opção Escolhida">✓</th>
                                 <th class="py-3 px-4 min-w-[150px]">Airbnb</th>
                                 <th class="py-3 px-4 min-w-[150px]">Obs / Detalhes</th>
-                                <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
+                                <th class="py-3 px-4 text-center w-32">Valor Total</th>
                                 <th class="py-3 px-4 min-w-[180px]">Link</th>
                                 <th class="py-3 px-4 text-right">Ação</th>
                             </tr>
@@ -199,7 +199,7 @@
                         <thead>
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 min-w-[150px]">Cia / Rota</th>
-                                <th class="py-3 px-2 text-center w-24">Tarifa (R$)</th>
+                                <th class="py-3 px-2 text-center w-28">Tarifa Unitária</th>
                                 <th class="py-3 px-2 text-center w-16" title="Quantidade de Pessoas">Qtd</th>
                                 <th class="py-3 px-2 text-center w-20">Ida/Volta</th>
                                 <th class="py-3 px-4 text-center w-28">Total (R$)</th>
@@ -452,6 +452,48 @@
             });
         }
 
+        // --- LÓGICA DE CÁLCULO E FORMATAÇÃO ---
+        
+        // Formata qualquer número para "xx,xx" pt-BR (sem R$)
+        window.formatMoeda = (val) => {
+            return (val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+        
+        // Transforma "10,50" e "1.000,00" de volta em float do JS para salvar no Banco
+        window.parseMoeda = (v) => {
+            if (typeof v === 'number') return v;
+            if (!v) return 0;
+            let str = v.toString().trim();
+            if (str.includes('.') && str.includes(',')) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (str.includes(',')) {
+                str = str.replace(',', '.');
+            }
+            return parseFloat(str) || 0;
+        };
+
+        window.calcularValorIngrediente = (quantidade, unidade, preco) => {
+            if (!preco) return 0;
+            if (unidade === 'kg' || unidade === 'g') {
+                const pesoEmKg = unidade === 'g' ? quantidade / 1000 : quantidade;
+                return pesoEmKg * preco;
+            }
+            return quantidade * preco;
+        };
+
+        window.updateMiniChart = (inst, id, val, color) => {
+            const el = document.getElementById(id);
+            if (!el) return inst; 
+            const ctx = el.getContext('2d');
+            if (inst) inst.destroy();
+            const remaining = Math.max(0, BUDGET_TOTAL - val);
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: { datasets: [{ data: [val, remaining], backgroundColor: [color, '#f5f5f4'], borderWidth: 0 }] },
+                options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false }, animation: false } 
+            });
+        };
+
         // --- RENDER FUNCTIONS ---
         function renderPayments(data) {
             const body = document.getElementById('payments-table-body');
@@ -474,41 +516,18 @@
                         personTotal += val;
                     }
                     html += `
-                        <td class="px-2 py-4 cursor-pointer" onclick="togglePayment('${name}', '${m}')" title="Valor: R$ ${val}">
+                        <td class="px-2 py-4 cursor-pointer" onclick="togglePayment('${name}', '${m}')" title="Valor: R$ ${formatMoeda(val)}">
                             <span class="${isPaid ? 'text-teal-600' : 'text-stone-200'} text-lg">${isPaid ? '✅' : '⚪'}</span>
                         </td>`;
                 });
-                html += `<td class="px-4 py-4 text-right font-black text-stone-600">R$ ${personTotal}</td>`;
+                html += `<td class="px-4 py-4 text-right font-black text-stone-600">R$ ${window.formatMoeda(personTotal)}</td>`;
                 row.innerHTML = html;
                 body.appendChild(row);
             });
 
-            document.getElementById('total-raised-display').innerText = `R$ ${total.toLocaleString('pt-BR')},00`;
+            document.getElementById('total-raised-display').innerText = `R$ ${window.formatMoeda(total)}`;
             document.getElementById('pct-display').innerText = `${Math.round((total / BUDGET_TOTAL) * 100)}%`;
         }
-
-        // LÓGICA DE CÁLCULO
-        window.calcularValorIngrediente = (quantidade, unidade, preco) => {
-            if (!preco) return 0;
-            if (unidade === 'kg' || unidade === 'g') {
-                const pesoEmKg = unidade === 'g' ? quantidade / 1000 : quantidade;
-                return pesoEmKg * preco;
-            }
-            return quantidade * preco;
-        };
-
-        window.updateMiniChart = (inst, id, val, color) => {
-            const el = document.getElementById(id);
-            if (!el) return inst; 
-            const ctx = el.getContext('2d');
-            if (inst) inst.destroy();
-            const remaining = Math.max(0, BUDGET_TOTAL - val);
-            return new Chart(ctx, {
-                type: 'doughnut',
-                data: { datasets: [{ data: [val, remaining], backgroundColor: [color, '#f5f5f4'], borderWidth: 0 }] },
-                options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false }, animation: false } 
-            });
-        };
 
         function renderLogistics(logs) {
             const airBody = document.getElementById('airbnb-table-body');
@@ -565,7 +584,12 @@
                         </td>
                         <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
                         <td class="py-3 px-4"><input class="table-input text-xs text-stone-500" value="${obs}" onblur="updateLog('${d.id}', 'obs', this.value)"></td>
-                        <td class="py-3 px-4 text-center"><input type="number" class="w-24 text-center font-bold text-teal-600 table-input px-1" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center">
+                                <span class="text-[10px] text-stone-400 font-bold mr-1">R$</span>
+                                <input type="text" inputmode="decimal" class="w-20 text-center font-bold text-teal-600 table-input px-1" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
+                            </div>
+                        </td>
                         <td class="py-3 px-4">
                             <div class="flex items-center min-w-[180px]">
                                 <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
@@ -577,12 +601,17 @@
                 } else if (d.type === 'bus') {
                     tr.innerHTML = `
                         <td class="py-4 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
-                        <td class="py-4 px-2 text-center"><input type="number" class="w-16 text-center font-bold text-stone-500 table-input px-1" value="${price}" onblur="updateLog('${d.id}', 'price', this.value)"></td>
+                        <td class="py-4 px-2 text-center">
+                            <div class="flex items-center justify-center">
+                                <span class="text-[10px] text-stone-400 font-bold mr-1">R$</span>
+                                <input type="text" inputmode="decimal" class="w-16 text-center font-bold text-stone-500 table-input px-1" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
+                            </div>
+                        </td>
                         <td class="py-4 px-2 text-center"><input type="number" class="w-12 text-center font-bold text-stone-500 table-input px-1" value="${qtdBus}" onblur="updateLog('${d.id}', 'qtd', this.value)"></td>
                         <td class="py-4 px-2 text-center">
                             <input type="checkbox" class="w-4 h-4 accent-blue-600 cursor-pointer" ${isRoundTrip ? 'checked' : ''} onchange="updateLog('${d.id}', 'roundTrip', this.checked)">
                         </td>
-                        <td class="py-4 px-4 text-center font-black text-blue-600">R$ ${finalBusPrice.toFixed(2)}</td>
+                        <td class="py-4 px-4 text-center font-black text-blue-600">R$ ${window.formatMoeda(finalBusPrice)}</td>
                         <td class="py-4 px-4">
                             <div class="flex items-center min-w-[180px]">
                                 <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
@@ -610,12 +639,12 @@
                            <option value="pack (15)" ${unit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
                            <option value="pack (24)" ${unit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
-                    let placeholderPrincipal = 'R$/un';
-                    if (ehPorPesoPrincipal) placeholderPrincipal = 'R$/kg';
-                    else if (unit === 'L') placeholderPrincipal = 'R$/L';
-                    else if (unit === 'lata') placeholderPrincipal = 'R$/lata';
-                    else if (unit === 'placa') placeholderPrincipal = 'R$/placa';
-                    else if (unit.includes('pack')) placeholderPrincipal = 'R$/pack';
+                    let placeholderPrincipal = '0,00/un';
+                    if (ehPorPesoPrincipal) placeholderPrincipal = '0,00/kg';
+                    else if (unit === 'L') placeholderPrincipal = '0,00/L';
+                    else if (unit === 'lata') placeholderPrincipal = '0,00/lata';
+                    else if (unit === 'placa') placeholderPrincipal = '0,00/placa';
+                    else if (unit.includes('pack')) placeholderPrincipal = '0,00/pack';
                     
                     const showTotalPrincipal = (amount !== 1 || ehPorPesoPrincipal) && price > 0 && ingredients.length === 0;
 
@@ -634,13 +663,13 @@
                         </td>
                         <td class="py-3 px-4 text-center align-top pt-4">
                             ${ingredients.length > 0 
-                                ? `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${dishTotal.toFixed(2)}</div>` 
+                                ? `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${window.formatMoeda(dishTotal)}</div>` 
                                 : `<div class="flex flex-col items-center gap-1.5">
-                                       <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[80px] shadow-sm">
+                                       <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
                                            <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
-                                           <input type="number" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price || ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
+                                           <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="${placeholderPrincipal}" onblur="updateLog('${d.id}', 'price', this.value)">
                                        </div>
-                                       ${showTotalPrincipal ? `<div class="text-[9px] text-teal-700 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100 whitespace-nowrap">Total: R$ ${valorCalculadoPrincipal.toFixed(2)}</div>` : ''}
+                                       ${showTotalPrincipal ? `<div class="text-[9px] text-teal-700 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100 whitespace-nowrap">Subtotal: R$ ${window.formatMoeda(valorCalculadoPrincipal)}</div>` : ''}
                                    </div>`
                             }
                         </td>
@@ -669,16 +698,16 @@
                             const valorCalculado = window.calcularValorIngrediente(ingAmount, ingUnit, ingPrice);
                             const ehPorPeso = (ingUnit === 'kg' || ingUnit === 'g');
                             
-                            let placeholderText = 'R$/un';
-                            if (ehPorPeso) placeholderText = 'R$/kg';
-                            else if (ingUnit === 'L') placeholderText = 'R$/L';
-                            else if (ingUnit === 'lata') placeholderText = 'R$/lata';
-                            else if (ingUnit === 'placa') placeholderText = 'R$/placa';
-                            else if (ingUnit.includes('pack')) placeholderText = 'R$/pack';
+                            let placeholderText = '0,00/un';
+                            if (ehPorPeso) placeholderText = '0,00/kg';
+                            else if (ingUnit === 'L') placeholderText = '0,00/L';
+                            else if (ingUnit === 'lata') placeholderText = '0,00/lata';
+                            else if (ingUnit === 'placa') placeholderText = '0,00/placa';
+                            else if (ingUnit.includes('pack')) placeholderText = '0,00/pack';
                             
                             const showTotal = (ingAmount !== 1 || ehPorPeso) && ingPrice > 0;
                             const labelCalculo = showTotal 
-                                ? `<div class="w-full text-[9px] text-teal-700 font-bold px-[30px] sm:px-[140px] pb-2 mt-[-4px]">Subtotal: R$ ${valorCalculado.toFixed(2)}</div>`
+                                ? `<div class="w-full text-[9px] text-teal-700 font-bold px-[30px] sm:px-[140px] pb-2 mt-[-4px]">Subtotal: R$ ${window.formatMoeda(valorCalculado)}</div>`
                                 : '';
 
                             const ingUnitOptions = isFood 
@@ -708,9 +737,9 @@
                                                 ${ingUnitOptions}
                                             </select>
                                             
-                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1 py-0.5 ml-2 w-[72px]">
+                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1 py-0.5 ml-2 w-[85px]">
                                                 <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
-                                                <input type="number" class="w-full font-medium text-teal-600 text-[11px] focus:outline-none text-right" value="${ingPrice || ''}" placeholder="${placeholderText}" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
+                                                <input type="text" inputmode="decimal" class="w-full font-medium text-teal-600 text-[11px] focus:outline-none text-right" value="${ingPrice > 0 ? window.formatMoeda(ingPrice) : ''}" placeholder="${placeholderText}" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
                                             </div>
                                             
                                             <button onclick="deleteIngredient('${d.id}', '${ing.id}')" class="text-stone-300 hover:text-red-500 text-[10px] font-bold bg-stone-50 px-2 py-1.5 rounded ml-2">❌</button>
@@ -728,12 +757,10 @@
                 }
             });
 
-            const formatBRL = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-            document.getElementById('airbnb-total').innerText = formatBRL(totalAirbnb);
-            document.getElementById('bus-total').innerText = formatBRL(totalBus);
-            document.getElementById('food-total').innerText = formatBRL(totalFood);
-            document.getElementById('drinks-total').innerText = formatBRL(totalDrinks);
+            document.getElementById('airbnb-total').innerText = `R$ ${window.formatMoeda(totalAirbnb)}`;
+            document.getElementById('bus-total').innerText = `R$ ${window.formatMoeda(totalBus)}`;
+            document.getElementById('food-total').innerText = `R$ ${window.formatMoeda(totalFood)}`;
+            document.getElementById('drinks-total').innerText = `R$ ${window.formatMoeda(totalDrinks)}`;
 
             const totalGeralGastos = totalAirbnb + totalBus + totalFood + totalDrinks;
             updateExpensesChart(totalGeralGastos);
@@ -744,11 +771,11 @@
             drinkChartInst = window.updateMiniChart(drinkChartInst, 'chartDrinks', totalDrinks, '#A855F7');
 
             const logEl = document.getElementById('resumo-logistica');
-            if(logEl) logEl.innerText = formatBRL(totalAirbnb + totalBus);
+            if(logEl) logEl.innerText = `R$ ${window.formatMoeda(totalAirbnb + totalBus)}`;
             const foodEl = document.getElementById('resumo-food');
-            if(foodEl) foodEl.innerText = formatBRL(totalFood);
+            if(foodEl) foodEl.innerText = `R$ ${window.formatMoeda(totalFood)}`;
             const drinkEl = document.getElementById('resumo-drinks');
-            if(drinkEl) drinkEl.innerText = formatBRL(totalDrinks);
+            if(drinkEl) drinkEl.innerText = `R$ ${window.formatMoeda(totalDrinks)}`;
         }
 
         function renderChecklists(checks) {
@@ -774,7 +801,8 @@
         window.updateLog = async (id, f, v) => { 
             if (currentUser) {
                 let val = v;
-                if (f === 'price' || f === 'amount' || f === 'qtd') val = parseFloat(v) || 0;
+                if (f === 'price') val = window.parseMoeda(v);
+                else if (f === 'amount' || f === 'qtd') val = parseFloat(v) || 0;
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logistics', id), { [f]: val }, { merge: true }); 
             }
         };
@@ -809,7 +837,8 @@
                 ingredients = ingredients.map(ing => {
                     if (ing.id === ingId) {
                         let val = value;
-                        if (field === 'amount' || field === 'price') val = parseFloat(value) || 0;
+                        if (field === 'price') val = window.parseMoeda(value);
+                        else if (field === 'amount') val = parseFloat(value) || 0;
                         return { ...ing, [field]: val };
                     }
                     return ing;
@@ -877,7 +906,7 @@
             
             const pct = Math.round((totalExpenses / BUDGET_TOTAL) * 100);
             
-            document.getElementById('total-expenses-display').innerText = totalExpenses.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('total-expenses-display').innerText = `R$ ${window.formatMoeda(totalExpenses)}`;
             document.getElementById('expenses-pct-display').innerText = `${pct}%`;
 
             expensesChartInstance = new Chart(ctx, {
