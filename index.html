@@ -546,6 +546,20 @@
                     const colorClass = isFood ? 'text-orange-600' : 'text-purple-600';
                     const targetBody = isFood ? foodBody : drinksBody;
 
+                    const unitOptions = isFood 
+                        ? `<option value="un" ${unit === 'un' ? 'selected' : ''}>un</option>
+                           <option value="lata" ${unit === 'lata' ? 'selected' : ''}>lata</option>
+                           <option value="placa" ${unit === 'placa' ? 'selected' : ''}>placa</option>
+                           <option value="kg" ${unit === 'kg' ? 'selected' : ''}>kg</option>
+                           <option value="g" ${unit === 'g' ? 'selected' : ''}>g</option>
+                           <option value="L" ${unit === 'L' ? 'selected' : ''}>L</option>`
+                        : `<option value="un" ${unit === 'un' ? 'selected' : ''}>un</option>
+                           <option value="L" ${unit === 'L' ? 'selected' : ''}>L</option>
+                           <option value="pack (6)" ${unit === 'pack (6)' ? 'selected' : ''}>pack (6)</option>
+                           <option value="pack (12)" ${unit === 'pack (12)' ? 'selected' : ''}>pack (12)</option>
+                           <option value="pack (15)" ${unit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
+                           <option value="pack (24)" ${unit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
+
                     tr.innerHTML = `
                         <td class="py-3 px-4 w-full min-w-[200px]">
                             <input class="table-input font-bold text-stone-800 w-full" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
@@ -555,12 +569,7 @@
                             <div class="flex items-center justify-center gap-1">
                                 <input type="number" class="w-10 text-center font-bold text-stone-600 table-input px-1" value="${amount}" onblur="updateLog('${d.id}', 'amount', this.value)">
                                 <select onchange="updateLog('${d.id}', 'unit', this.value)" class="text-[10px] p-1 rounded-md bg-stone-100 text-stone-600 outline-none cursor-pointer border border-stone-200">
-                                    <option value="un" ${unit === 'un' ? 'selected' : ''}>un</option>
-                                    <option value="lata" ${unit === 'lata' ? 'selected' : ''}>lata</option>
-                                    <option value="placa" ${unit === 'placa' ? 'selected' : ''}>placa</option>
-                                    <option value="kg" ${unit === 'kg' ? 'selected' : ''}>kg</option>
-                                    <option value="g" ${unit === 'g' ? 'selected' : ''}>g</option>
-                                    <option value="L" ${unit === 'L' ? 'selected' : ''}>L</option>
+                                    ${unitOptions}
                                 </select>
                             </div>
                         </td>
@@ -597,12 +606,29 @@
                             
                             const valorCalculado = window.calcularValorIngrediente(ingAmount, ingUnit, ingPrice);
                             const ehPorPeso = (ingUnit === 'kg' || ingUnit === 'g');
-                            const placeholderText = ehPorPeso ? 'R$/kg' : 'R$ Un';
+                            
+                            let placeholderText = 'R$ Un';
+                            if (ehPorPeso) placeholderText = 'R$/kg';
+                            else if (ingUnit.includes('pack')) placeholderText = 'R$ Pack';
                             
                             const showTotal = (ingAmount > 1 || ehPorPeso) && ingPrice > 0;
                             const labelCalculo = showTotal 
                                 ? `<div class="w-full text-[9px] text-teal-700 font-bold px-[30px] sm:px-[140px] pb-2 mt-[-4px]">Total: R$ ${valorCalculado.toFixed(2)}</div>`
                                 : '';
+
+                            const ingUnitOptions = isFood 
+                                ? `<option value="un" ${ingUnit === 'un' ? 'selected' : ''}>un</option>
+                                   <option value="lata" ${ingUnit === 'lata' ? 'selected' : ''}>lata</option>
+                                   <option value="placa" ${ingUnit === 'placa' ? 'selected' : ''}>placa</option>
+                                   <option value="kg" ${ingUnit === 'kg' ? 'selected' : ''}>kg</option>
+                                   <option value="g" ${ingUnit === 'g' ? 'selected' : ''}>g</option>
+                                   <option value="L" ${ingUnit === 'L' ? 'selected' : ''}>L</option>`
+                                : `<option value="un" ${ingUnit === 'un' ? 'selected' : ''}>un</option>
+                                   <option value="L" ${ingUnit === 'L' ? 'selected' : ''}>L</option>
+                                   <option value="pack (6)" ${ingUnit === 'pack (6)' ? 'selected' : ''}>pack (6)</option>
+                                   <option value="pack (12)" ${ingUnit === 'pack (12)' ? 'selected' : ''}>pack (12)</option>
+                                   <option value="pack (15)" ${ingUnit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
+                                   <option value="pack (24)" ${ingUnit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
                             ingHtml += `
                                 <div class="flex flex-col border-b border-stone-100/50 last:border-0 group">
@@ -614,12 +640,7 @@
                                         <div class="flex items-center opacity-100 sm:opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0">
                                             <input type="number" class="w-10 text-center font-medium text-stone-600 bg-white border border-stone-200 rounded-l px-1 py-1 text-[11px] focus:outline-none" value="${ingAmount}" onblur="updateIngField('${d.id}', '${ing.id}', 'amount', this.value)">
                                             <select onchange="updateIngField('${d.id}', '${ing.id}', 'unit', this.value)" class="text-[10px] p-1 py-1.5 rounded-r bg-stone-100 text-stone-600 border border-stone-200 focus:outline-none cursor-pointer">
-                                                <option value="un" ${ingUnit === 'un' ? 'selected' : ''}>un</option>
-                                                <option value="lata" ${ingUnit === 'lata' ? 'selected' : ''}>lata</option>
-                                                <option value="placa" ${ingUnit === 'placa' ? 'selected' : ''}>placa</option>
-                                                <option value="kg" ${ingUnit === 'kg' ? 'selected' : ''}>kg</option>
-                                                <option value="g" ${ingUnit === 'g' ? 'selected' : ''}>g</option>
-                                                <option value="L" ${ingUnit === 'L' ? 'selected' : ''}>L</option>
+                                                ${ingUnitOptions}
                                             </select>
                                             
                                             <div class="flex items-center bg-white border border-stone-200 rounded px-1 py-0.5 ml-2 w-[72px]">
