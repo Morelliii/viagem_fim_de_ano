@@ -234,7 +234,7 @@
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 w-full">Prato / Item</th>
                                 <th class="py-3 px-2 text-center w-28 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor (R$)</th>
+                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor / Total</th>
                                 <th class="py-3 px-4 text-center w-24 whitespace-nowrap">Status</th>
                                 <th class="py-3 px-4 text-right whitespace-nowrap">Ação</th>
                             </tr>
@@ -263,7 +263,7 @@
                             <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
                                 <th class="py-3 px-4 w-full">Bebida</th>
                                 <th class="py-3 px-2 text-center w-28 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor (R$)</th>
+                                <th class="py-3 px-4 text-center min-w-[200px] whitespace-nowrap">Valor / Total</th>
                                 <th class="py-3 px-4 text-center w-24 whitespace-nowrap">Status</th>
                                 <th class="py-3 px-4 text-right whitespace-nowrap">Ação</th>
                             </tr>
@@ -627,9 +627,15 @@
                            <option value="pack (24)" ${unit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
                     let shortUnit = unit;
+                    if (unit === 'g') shortUnit = 'kg';
                     if (unit.includes('pack')) shortUnit = 'pack';
-                    
-                    const showTotalPrincipal = (amount !== 1 || ehPorPesoPrincipal) && price > 0 && ingredients.length === 0;
+
+                    let labelPreco = 'PREÇO/UN:';
+                    if (ehPorPesoPrincipal) labelPreco = 'PREÇO/KG:';
+                    else if (unit === 'L') labelPreco = 'PREÇO/L:';
+                    else if (unit === 'lata') labelPreco = 'PREÇO/LATA:';
+                    else if (unit === 'placa') labelPreco = 'PREÇO/PLACA:';
+                    else if (unit.includes('pack')) labelPreco = 'PREÇO/PACK:';
 
                     let qtdCellHtml = '';
                     if (ingredients.length > 0) {
@@ -649,33 +655,21 @@
                     if (ingredients.length > 0) {
                         priceCellHtml = `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${window.formatMoeda(dishTotal)}</div>`;
                     } else {
-                        if (showTotalPrincipal) {
-                            priceCellHtml = `
-                                <div class="flex items-center justify-center gap-3">
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">Preço:</span>
-                                        <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
-                                            <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortUnit}</span>
-                                            <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1 bg-teal-50 px-2 py-1 rounded border border-teal-100">
-                                        <span class="text-[9px] font-bold text-teal-600 uppercase">Total:</span>
-                                        <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculadoPrincipal)}</span>
-                                    </div>
-                                </div>
-                            `;
-                        } else {
-                            priceCellHtml = `
-                                <div class="flex items-center justify-center gap-1">
-                                    <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">Preço:</span>
-                                    <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
+                        priceCellHtml = `
+                            <div class="flex items-center justify-center gap-3">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">${labelPreco}</span>
+                                    <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
                                         <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortUnit}</span>
                                         <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
                                     </div>
                                 </div>
-                            `;
-                        }
+                                <div class="flex items-center gap-1 bg-teal-50 px-2 py-1 rounded border border-teal-100">
+                                    <span class="text-[9px] font-bold text-teal-600 uppercase">Total:</span>
+                                    <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculadoPrincipal)}</span>
+                                </div>
+                            </div>
+                        `;
                     }
 
                     tr.innerHTML = `
@@ -715,9 +709,15 @@
                             const ehPorPeso = (ingUnit === 'kg' || ingUnit === 'g');
                             
                             let shortIngUnit = ingUnit;
+                            if (ingUnit === 'g') shortIngUnit = 'kg';
                             if (ingUnit.includes('pack')) shortIngUnit = 'pack';
                             
-                            const showTotal = (ingAmount !== 1 || ehPorPeso) && ingPrice > 0;
+                            let labelPrecoIng = 'PREÇO/UN:';
+                            if (ehPorPeso) labelPrecoIng = 'PREÇO/KG:';
+                            else if (ingUnit === 'L') labelPrecoIng = 'PREÇO/L:';
+                            else if (ingUnit === 'lata') labelPrecoIng = 'PREÇO/LATA:';
+                            else if (ingUnit === 'placa') labelPrecoIng = 'PREÇO/PLACA:';
+                            else if (ingUnit.includes('pack')) labelPrecoIng = 'PREÇO/PACK:';
 
                             const ingUnitOptions = isFood 
                                 ? `<option value="un" ${ingUnit === 'un' ? 'selected' : ''}>un</option>
@@ -752,21 +752,18 @@
                                         </div>
 
                                         <div class="flex items-center w-[160px] justify-end flex-shrink-0">
-                                            <span class="text-[9px] font-bold text-stone-500 uppercase mr-1.5 whitespace-nowrap hidden sm:inline">Preço:</span>
-                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
+                                            <span class="text-[9px] font-bold text-stone-500 uppercase mr-1.5 whitespace-nowrap hidden sm:inline">${labelPrecoIng}</span>
+                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[80px] shadow-sm">
                                                 <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortIngUnit}</span>
                                                 <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${ingPrice > 0 ? window.formatMoeda(ingPrice) : ''}" placeholder="0,00" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
                                             </div>
                                         </div>
 
                                         <div class="flex items-center w-[100px] justify-center flex-shrink-0">
-                                            ${showTotal 
-                                                ? `<div class="bg-teal-50 px-2 py-1 rounded border border-teal-100 w-full text-center flex items-center justify-center gap-1">
-                                                       <span class="text-[9px] font-bold text-teal-600 uppercase hidden sm:inline">Total:</span>
-                                                       <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculado)}</span>
-                                                   </div>` 
-                                                : `<span class="text-stone-300 font-bold w-full text-center">-</span>`
-                                            }
+                                            <div class="bg-teal-50 px-2 py-1 rounded border border-teal-100 w-full text-center flex items-center justify-center gap-1">
+                                                <span class="text-[9px] font-bold text-teal-600 uppercase hidden sm:inline">Total:</span>
+                                                <span class="text-[11px] text-teal-700 font-black whitespace-nowrap">R$ ${window.formatMoeda(valorCalculado)}</span>
+                                            </div>
                                         </div>
 
                                         <div class="w-[24px] text-right flex-shrink-0">
