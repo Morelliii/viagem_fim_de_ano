@@ -531,6 +531,8 @@
                 const price = d.price || 0;
                 const amount = d.amount || 1;
                 const unit = d.unit || 'un';
+                const obs = d.obs || "";
+                const link = d.link || "";
                 const status = d.status || "Pendente";
                 const ingredients = d.ingredients || [];
                 const isSelectedAirbnb = d.selected === true;
@@ -556,10 +558,55 @@
                 else if (d.type === 'food') totalFood += dishTotal;
                 else if (d.type === 'drinks') totalDrinks += dishTotal;
 
+                const linkIcon = link ? `<a href="${link.startsWith('http') ? link : 'https://'+link}" target="_blank" title="Abrir site" class="text-xl hover:scale-110 transition-transform ml-2">🔗</a>` : '';
+
                 if (d.type === 'airbnb') {
-                    // ... (airbnb mantido idêntico)
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-stone-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-3 px-2 text-center">
+                            <input type="checkbox" class="w-4 h-4 accent-rose-600 cursor-pointer" ${isSelectedAirbnb ? 'checked' : ''} onchange="selectAirbnb('${d.id}', this.checked)">
+                        </td>
+                        <td class="py-3 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-3 px-4"><input class="table-input text-xs text-stone-500" value="${obs}" onblur="updateLog('${d.id}', 'obs', this.value)"></td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center">
+                                <span class="text-[10px] text-stone-400 font-bold mr-1">R$</span>
+                                <input type="text" inputmode="decimal" class="w-20 text-center font-bold text-teal-600 table-input px-1" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center min-w-[180px]">
+                                <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
+                                ${linkIcon}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                    airBody.appendChild(tr);
                 } else if (d.type === 'bus') {
-                    // ... (bus mantido idêntico)
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-stone-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="py-4 px-4"><input class="table-input font-bold" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)"></td>
+                        <td class="py-4 px-2 text-center">
+                            <div class="flex items-center justify-center">
+                                <span class="text-[10px] text-stone-400 font-bold mr-1">R$</span>
+                                <input type="text" inputmode="decimal" class="w-16 text-center font-bold text-stone-500 table-input px-1" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
+                            </div>
+                        </td>
+                        <td class="py-4 px-2 text-center"><input type="number" class="w-12 text-center font-bold text-stone-500 table-input px-1" value="${qtdBus}" onblur="updateLog('${d.id}', 'qtd', this.value)"></td>
+                        <td class="py-4 px-2 text-center">
+                            <input type="checkbox" class="w-4 h-4 accent-blue-600 cursor-pointer" ${isRoundTrip ? 'checked' : ''} onchange="updateLog('${d.id}', 'roundTrip', this.checked)">
+                        </td>
+                        <td class="py-4 px-4 text-center font-black text-blue-600">R$ ${window.formatMoeda(finalBusPrice)}</td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center min-w-[180px]">
+                                <input class="table-input text-sm text-teal-600 w-full" value="${link}" placeholder="Colar link..." onblur="updateLog('${d.id}', 'link', this.value)">
+                                ${linkIcon}
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-right"><button class="text-red-300 hover:text-red-500" onclick="deleteLogEntry('${d.id}')">❌</button></td>`;
+                    busBody.appendChild(tr);
                 } else if (d.type === 'food' || d.type === 'drinks') {
                     const isFood = d.type === 'food';
                     const colorClass = isFood ? 'text-orange-600' : 'text-purple-600';
