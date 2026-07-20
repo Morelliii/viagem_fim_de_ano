@@ -79,6 +79,7 @@
         <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                <!-- Cartão de Boas-Vindas -->
                 <div class="lg:col-span-6 glass-panel p-5 sm:p-6 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-2xl font-extrabold text-stone-900 mb-2">Olá, grupo! 👋</h2>
@@ -102,6 +103,7 @@
                     </div>
                 </div>
 
+                <!-- Progresso do Fundo -->
                 <div class="lg:col-span-3 bg-teal-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
                     <h3 class="text-sm font-bold mb-2">Progresso do Fundo</h3>
                     <div class="relative w-24 h-24 mb-2">
@@ -114,6 +116,7 @@
                     <p id="total-raised-display" class="text-base font-black mt-1 text-teal-300 italic">R$ 0,00</p>
                 </div>
 
+                <!-- Total de Gastos -->
                 <div class="lg:col-span-3 bg-rose-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
                     <h3 class="text-sm font-bold mb-2">Total de Gastos</h3>
                     <div class="relative w-24 h-24 mb-2">
@@ -126,6 +129,7 @@
                     <p id="total-expenses-display" class="text-base font-black mt-1 text-rose-300 italic">R$ 0,00</p>
                 </div>
 
+                <!-- Resumo: Logística -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Logística</h4>
@@ -134,6 +138,7 @@
                     <div class="relative w-16 h-16"><canvas id="chartLogistica"></canvas></div>
                 </div>
 
+                <!-- Resumo: Alimentação -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Alimentação</h4>
@@ -142,6 +147,7 @@
                     <div class="relative w-16 h-16"><canvas id="chartFood"></canvas></div>
                 </div>
 
+                <!-- Resumo: Bebidas -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bebidas</h4>
@@ -620,12 +626,10 @@
                            <option value="pack (15)" ${unit === 'pack (15)' ? 'selected' : ''}>pack (15)</option>
                            <option value="pack (24)" ${unit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
-                    let labelPreco = 'PREÇO/UN:';
-                    if (ehPorPesoPrincipal) labelPreco = 'PREÇO/KG:';
-                    else if (unit === 'L') labelPreco = 'PREÇO/L:';
-                    else if (unit === 'lata') labelPreco = 'PREÇO/LATA:';
-                    else if (unit === 'placa') labelPreco = 'PREÇO/PLACA:';
-                    else if (unit.includes('pack')) labelPreco = 'PREÇO/PACK:';
+                    let shortUnit = unit;
+                    if (unit.includes('pack')) shortUnit = 'pack';
+                    
+                    const showTotalPrincipal = (amount !== 1 || ehPorPesoPrincipal) && price > 0 && ingredients.length === 0;
 
                     let qtdCellHtml = '';
                     if (ingredients.length > 0) {
@@ -645,14 +649,13 @@
                     if (ingredients.length > 0) {
                         priceCellHtml = `<div class="font-bold text-teal-600 text-sm cursor-help" title="Soma automática dos ingredientes">R$ ${window.formatMoeda(dishTotal)}</div>`;
                     } else {
-                        const showTotalPrincipal = (amount !== 1 || ehPorPesoPrincipal) && price > 0;
                         if (showTotalPrincipal) {
                             priceCellHtml = `
                                 <div class="flex items-center justify-center gap-3">
                                     <div class="flex items-center gap-1">
-                                        <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">${labelPreco}</span>
-                                        <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
-                                            <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                        <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">Preço:</span>
+                                        <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
+                                            <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortUnit}</span>
                                             <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
                                         </div>
                                     </div>
@@ -665,9 +668,9 @@
                         } else {
                             priceCellHtml = `
                                 <div class="flex items-center justify-center gap-1">
-                                    <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">${labelPreco}</span>
-                                    <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[85px] shadow-sm">
-                                        <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                    <span class="text-[9px] font-bold text-stone-500 uppercase hidden lg:inline">Preço:</span>
+                                    <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
+                                        <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortUnit}</span>
                                         <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${price > 0 ? window.formatMoeda(price) : ''}" placeholder="0,00" onblur="updateLog('${d.id}', 'price', this.value)">
                                     </div>
                                 </div>
@@ -711,12 +714,8 @@
                             const valorCalculado = window.calcularValorIngrediente(ingAmount, ingUnit, ingPrice);
                             const ehPorPeso = (ingUnit === 'kg' || ingUnit === 'g');
                             
-                            let labelPrecoIng = 'PREÇO/UN:';
-                            if (ehPorPeso) labelPrecoIng = 'PREÇO/KG:';
-                            else if (ingUnit === 'L') labelPrecoIng = 'PREÇO/L:';
-                            else if (ingUnit === 'lata') labelPrecoIng = 'PREÇO/LATA:';
-                            else if (ingUnit === 'placa') labelPrecoIng = 'PREÇO/PLACA:';
-                            else if (ingUnit.includes('pack')) labelPrecoIng = 'PREÇO/PACK:';
+                            let shortIngUnit = ingUnit;
+                            if (ingUnit.includes('pack')) shortIngUnit = 'pack';
                             
                             const showTotal = (ingAmount !== 1 || ehPorPeso) && ingPrice > 0;
 
@@ -753,9 +752,9 @@
                                         </div>
 
                                         <div class="flex items-center w-[160px] justify-end flex-shrink-0">
-                                            <span class="text-[9px] font-bold text-stone-500 uppercase mr-1.5 whitespace-nowrap hidden sm:inline">${labelPrecoIng}</span>
-                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[80px] shadow-sm">
-                                                <span class="text-[9px] text-stone-400 font-bold mr-1">R$</span>
+                                            <span class="text-[9px] font-bold text-stone-500 uppercase mr-1.5 whitespace-nowrap hidden sm:inline">Preço:</span>
+                                            <div class="flex items-center bg-white border border-stone-200 rounded px-1.5 py-1 w-[100px] shadow-sm">
+                                                <span class="text-[9px] text-stone-400 font-bold mr-1 whitespace-nowrap">R$/${shortIngUnit}</span>
                                                 <input type="text" inputmode="decimal" class="w-full font-bold text-teal-600 text-[11px] bg-transparent focus:outline-none text-right" value="${ingPrice > 0 ? window.formatMoeda(ingPrice) : ''}" placeholder="0,00" onblur="updateIngField('${d.id}', '${ing.id}', 'price', this.value)">
                                             </div>
                                         </div>
