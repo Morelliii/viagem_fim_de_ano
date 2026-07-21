@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <!-- CAIXA INVISÍVEL (Só renderiza se a barra de loading concluir com SUCESSO) -->
+    <!-- CAIXA INVISÍVEL (Só renderiza se for autorizado) -->
     <div id="app-container" class="hidden">
         
         <!-- Menu Lateral (Drawer) -->
@@ -225,7 +225,7 @@
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
-                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-white text-blue-600 px-4 py-2 rounded-full shadow-sm hover:bg-blue-50 transition-all border border-white">+ Adicionar</button>
+                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-white text-blue-600 px-3 py-2 rounded-full shadow-sm hover:bg-blue-50 transition-all border border-white">+ Adicionar</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
@@ -257,9 +257,12 @@
             <section id="tab-mercado" class="hidden space-y-8">
                 <!-- Alimentação -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
-                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-white text-orange-600 px-4 py-2 rounded-full shadow-sm hover:bg-orange-50 transition-all border border-white">+ Adicionar Prato</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleAll('food')" class="text-[10px] font-bold bg-white/50 text-stone-600 px-3 py-2 rounded-full shadow-sm hover:bg-white transition-all border border-white">↕ Expandir/Ocultar</button>
+                            <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-white text-orange-600 px-4 py-2 rounded-full shadow-sm hover:bg-orange-50 transition-all border border-white">+ Adicionar Prato</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -286,9 +289,12 @@
 
                 <!-- Bebidas -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
-                        <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-white text-purple-600 px-4 py-2 rounded-full shadow-sm hover:bg-purple-50 transition-all border border-white">+ Adicionar Bebida</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleAll('drinks')" class="text-[10px] font-bold bg-white/50 text-stone-600 px-3 py-2 rounded-full shadow-sm hover:bg-white transition-all border border-white">↕ Expandir/Ocultar</button>
+                            <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-white text-purple-600 px-4 py-2 rounded-full shadow-sm hover:bg-purple-50 transition-all border border-white">+ Adicionar Bebida</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -430,6 +436,7 @@
             if (!menu.classList.contains('-translate-x-full')) window.toggleMenu();
         };
 
+        // Recolher/Expandir individual
         window.toggleIngredients = (id) => {
             const rows = document.querySelectorAll(`.ing-row-${id}`);
             const btn = document.getElementById(`toggle-btn-${id}`);
@@ -442,6 +449,23 @@
                 rows.forEach(r => r.classList.add('hidden'));
                 if (btn) btn.innerHTML = '▼ Ver Ingredientes';
             }
+        };
+
+        // Recolher/Expandir TODOS os pratos de uma categoria
+        window.toggleAll = (type) => {
+            const itemsWithIngredients = currentLogs.filter(l => l.type === type && l.ingredients && l.ingredients.length > 0);
+            if (itemsWithIngredients.length === 0) return;
+
+            // Se existe ALGUM prato que não está recolhido, então a ação será RECOLHER TUDO.
+            // Se TODOS estiverem recolhidos, a ação será EXPANDIR TUDO.
+            const anyExpanded = itemsWithIngredients.some(item => !collapsedDishes.has(item.id));
+            
+            if (anyExpanded) {
+                itemsWithIngredients.forEach(item => collapsedDishes.add(item.id));
+            } else {
+                itemsWithIngredients.forEach(item => collapsedDishes.delete(item.id));
+            }
+            renderLogistics(currentLogs);
         };
 
         // --- ANIMAÇÃO GAMER DA TELA DE CARREGAMENTO ---
@@ -569,11 +593,9 @@
             }
         });
 
-        // O Firebase grita aqui em caso de e-mail não listado nas regras
         const handlePermissionError = (err) => {
             if (err.code === 'permission-denied' && currentUser) {
                 authBackendStatus = 'denied'; 
-                // A UI não é mexida agora! O LoadingBar vai ler isso quando terminar.
             } else if (err.code !== 'permission-denied') {
                 console.error("Erro no Firebase:", err);
             }
