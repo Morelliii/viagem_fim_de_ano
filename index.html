@@ -35,10 +35,14 @@
     </style>
 </head>
 <body class="min-h-screen pb-12">
-    <!-- Loading Screen -->
-    <div id="loading" class="loading-overlay flex flex-col items-center justify-center font-bold text-teal-800 gap-4">
-        <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
-        <span>Carregando planejamento...</span>
+    <!-- Loading Screen Animada (Fake Loading Bar) -->
+    <div id="loading" class="loading-overlay flex flex-col items-center justify-center gap-2">
+        <span class="text-5xl animate-bounce mb-2">🌴</span>
+        <div class="w-48 h-2 bg-stone-200/50 rounded-full overflow-hidden">
+            <!-- A barra vai preencher via Javascript -->
+            <div id="loading-bar" class="h-full bg-teal-500 w-0 transition-all ease-out"></div>
+        </div>
+        <span id="loading-text" class="text-[10px] font-black text-stone-400 uppercase tracking-widest mt-1">Iniciando...</span>
     </div>
 
     <!-- Login Screen -->
@@ -70,7 +74,7 @@
         </div>
     </div>
 
-    <!-- CAIXA INVISÍVEL (Só renderiza se for autorizado) -->
+    <!-- CAIXA INVISÍVEL (Só renderiza se a barra de loading concluir com SUCESSO) -->
     <div id="app-container" class="hidden">
         
         <!-- Menu Lateral (Drawer) -->
@@ -137,7 +141,6 @@
                         </div>
                     </div>
 
-                    <!-- Cards sólidos com opacidade leve, sem blur pra evitar lag -->
                     <div class="lg:col-span-3 bg-teal-900/95 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center border border-teal-800/50">
                         <h3 class="text-sm font-bold mb-2">Progresso do Fundo</h3>
                         <div class="relative w-24 h-24 mb-2">
@@ -359,17 +362,6 @@
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // ATENÇÃO: Coloque aqui os exatos mesmos e-mails configurados nas Regras do Firestore.
-        // Isso bloqueia invasores na hora e aniquila o bug da tela piscando com dados do cache.
-        const emailsAutorizados = [
-            "seu.email@gmail.com",
-            "agatha.varjao@gmail.com",
-            "anailson@gmail.com",
-            "beatriz@gmail.com",
-            "jonatan@gmail.com",
-            "morelli.miguel.m@gmail.com"
-        ];
-
         const firebaseConfig = {
             apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o",
             authDomain: "viagemfimdeano2026.firebaseapp.com",
@@ -406,6 +398,7 @@
         let unsubPayments = null;
         let unsubLogistics = null;
         let unsubChecklists = null;
+        let authBackendStatus = 'pending'; // Controle seguro de tela
 
         window.toggleMenu = () => {
             const menu = document.getElementById('mobile-menu');
@@ -451,15 +444,58 @@
             }
         };
 
+        // --- ANIMAÇÃO GAMER DA TELA DE CARREGAMENTO ---
+        function runFakeLoading(callback) {
+            const bar = document.getElementById('loading-bar');
+            const text = document.getElementById('loading-text');
+            bar.style.transitionDuration = '0s';
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.transitionDuration = '300ms';
+                bar.style.width = '15%';
+                text.innerText = 'Autenticando usuário...';
+            }, 100);
+            
+            setTimeout(() => {
+                bar.style.transitionDuration = '500ms';
+                bar.style.width = '45%';
+                text.innerText = 'Sincronizando Firebase...';
+            }, 600);
+            
+            setTimeout(() => {
+                bar.style.transitionDuration = '400ms';
+                bar.style.width = '80%';
+                text.innerText = 'Descriptografando banco...';
+            }, 1200);
+            
+            setTimeout(() => {
+                bar.style.transitionDuration = '200ms';
+                bar.style.width = '100%';
+                text.innerText = 'Tudo pronto!';
+                setTimeout(callback, 300);
+            }, 1600);
+        }
+
         document.getElementById('btn-login-google').addEventListener('click', () => {
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
 
-        // Limpeza fulminante na hora de sair (Zera tudo para matar o cache-flash)
+        // Limpeza rigorosa ao sair para evitar que outra conta veja o cache
         window.sairDoSistema = () => {
             if (unsubPayments) unsubPayments();
             if (unsubLogistics) unsubLogistics();
             if (unsubChecklists) unsubChecklists();
+            
+            document.getElementById('airbnb-table-body').innerHTML = '';
+            document.getElementById('bus-table-body').innerHTML = '';
+            document.getElementById('food-table-body').innerHTML = '';
+            document.getElementById('drinks-table-body').innerHTML = '';
+            document.getElementById('payments-table-body').innerHTML = '';
+            document.getElementById('check-list-general').innerHTML = '';
+            document.getElementById('check-list-extra').innerHTML = '';
+            currentLogs = [];
+            collapsedDishes.clear();
             
             signOut(auth).then(() => {
                 const unauthScreen = document.getElementById('unauthorized-screen');
@@ -482,31 +518,18 @@
             const appContainer = document.getElementById('app-container');
             
             if (user) {
-                // Checagem Anti-Flash: Barrado no JavaScript antes do banco!
-                if (!emailsAutorizados.includes(user.email.toLowerCase())) {
-                    loadingScreen.classList.add('hidden');
-                    loadingScreen.classList.remove('flex');
-                    appContainer.classList.add('hidden');
-                    loginScreen.classList.add('hidden');
-                    loginScreen.classList.remove('flex');
-                    
-                    document.getElementById('unauth-email').innerText = user.email;
-                    unauthScreen.classList.remove('hidden');
-                    unauthScreen.classList.add('flex');
-                    return; 
-                }
-
-                // Autorizado: Prossegue o fluxo normal
                 currentUser = user;
+                authBackendStatus = 'pending'; // Zera o status de segurança
+                
+                // Esconde login e erro, mostra só o loading e roda a animação
                 loginScreen.classList.add('hidden');
                 loginScreen.classList.remove('flex');
-                
-                loadingScreen.classList.remove('hidden'); 
-                loadingScreen.classList.add('flex'); 
-                
                 unauthScreen.classList.add('hidden');
                 unauthScreen.classList.remove('flex');
                 appContainer.classList.add('hidden');
+                
+                loadingScreen.classList.remove('hidden'); 
+                loadingScreen.classList.add('flex'); 
                 
                 document.getElementById('unauth-email').innerText = user.email;
                 userDisplay.innerHTML = `
@@ -516,7 +539,22 @@
                     </div>
                     <button onclick="sairDoSistema()" class="text-xs font-bold bg-rose-50/90 text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-200/50 shadow-sm">Sair</button>
                 `;
-                startSync();
+                
+                startSync(); // Pede autorização ao Firebase no background
+                
+                // Quando a barra terminar de encher (1.6s depois), decide o que mostrar
+                runFakeLoading(() => {
+                    loadingScreen.classList.add('hidden');
+                    loadingScreen.classList.remove('flex');
+                    
+                    if (authBackendStatus === 'denied') {
+                        unauthScreen.classList.remove('hidden');
+                        unauthScreen.classList.add('flex');
+                    } else {
+                        appContainer.classList.remove('hidden');
+                    }
+                });
+                
             } else {
                 currentUser = null;
                 userDisplay.innerHTML = '';
@@ -531,16 +569,11 @@
             }
         });
 
-        // Caso o usuário burle o JS, o Firestore ainda tem a regra (Double Security)
+        // O Firebase grita aqui em caso de e-mail não listado nas regras
         const handlePermissionError = (err) => {
             if (err.code === 'permission-denied' && currentUser) {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('loading').classList.remove('flex');
-                document.getElementById('app-container').classList.add('hidden');
-                
-                const unauth = document.getElementById('unauthorized-screen');
-                unauth.classList.remove('hidden');
-                unauth.classList.add('flex');
+                authBackendStatus = 'denied'; 
+                // A UI não é mexida agora! O LoadingBar vai ler isso quando terminar.
             } else if (err.code !== 'permission-denied') {
                 console.error("Erro no Firebase:", err);
             }
@@ -550,10 +583,7 @@
             if (!currentUser) return;
             
             unsubPayments = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('loading').classList.remove('flex');
-                document.getElementById('app-container').classList.remove('hidden');
-                
+                if (authBackendStatus !== 'denied') authBackendStatus = 'success';
                 const data = {};
                 snap.forEach(d => data[d.id] = d.data());
                 renderPayments(data);
@@ -561,12 +591,14 @@
             }, handlePermissionError);
 
             unsubLogistics = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
+                if (authBackendStatus !== 'denied') authBackendStatus = 'success';
                 currentLogs = [];
                 snap.forEach(d => currentLogs.push({ id: d.id, ...d.data() }));
                 renderLogistics(currentLogs);
             }, handlePermissionError);
 
             unsubChecklists = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
+                if (authBackendStatus !== 'denied') authBackendStatus = 'success';
                 const checks = [];
                 snap.forEach(d => checks.push({ id: d.id, ...d.data() }));
                 renderChecklists(checks);
@@ -842,7 +874,7 @@
                     if (ingredients.length > 0) {
                         const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
                         
-                        let ingHtml = `<td colspan="5" class="px-2 sm:px-8 py-2 border-b border-stone-200/40 bg-white/40">
+                        let ingHtml = `<td colspan="5" class="px-2 sm:px-8 py-2 border-b border-stone-200/40 bg-white/30 backdrop-blur-sm">
                                        <div class="space-y-1 border-l-2 ${borderClass} pl-4 pb-2">`;
                         
                         ingredients.forEach((ing) => {
@@ -882,7 +914,7 @@
                                    <option value="pack (24)" ${ingUnit === 'pack (24)' ? 'selected' : ''}>pack (24)</option>`;
 
                             ingHtml += `
-                                <div class="flex flex-col xl:flex-row xl:items-center justify-between text-xs py-2 border-b border-stone-200/30 last:border-0 group gap-2 hover:bg-white/50 transition-colors">
+                                <div class="flex flex-col xl:flex-row xl:items-center justify-between text-xs py-2 border-b border-stone-200/30 last:border-0 group gap-2 hover:bg-white/40 transition-colors">
                                     <div class="flex items-center gap-2 flex-1 w-full min-w-[120px]">
                                         <input type="checkbox" ${ing.bought ? 'checked' : ''} onchange="updateIngField('${d.id}', '${ing.id}', 'bought', this.checked)" class="w-4 h-4 accent-teal-600 cursor-pointer flex-shrink-0">
                                         <input class="bg-transparent font-medium text-stone-600 w-full ${ing.bought ? 'line-through opacity-40' : ''} focus:outline-none focus:border-b focus:border-teal-300 transition-colors" value="${ing.name}" onblur="updateIngField('${d.id}', '${ing.id}', 'name', this.value)">
