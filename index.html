@@ -41,7 +41,11 @@
     <!-- Unauthorized Screen (Acesso Negado) -->
     <div id="unauthorized-screen" class="fixed inset-0 bg-stone-100 z-[10000] hidden flex-col items-center justify-center">
         <div class="bg-white p-10 rounded-3xl custom-shadow text-center max-w-md w-full mx-4 border-t-8 border-rose-500">
-            <span class="text-6xl mb-4 block">🔒</span>
+            <div class="flex justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-rose-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+            </div>
             <h1 class="text-3xl font-extrabold text-stone-900 mb-2">Acesso Restrito</h1>
             <p class="text-stone-500 mb-6 text-sm">O e-mail <br><span id="unauth-email" class="font-bold text-stone-700 text-base"></span><br> não possui permissão para ver o painel.</p>
             <p class="text-stone-500 mb-8 text-sm">Por favor, entre em contato com a administração do site para solicitar liberação.</p>
@@ -92,7 +96,6 @@
         <!-- SECTION: RESUMO -->
         <section id="tab-resumo" class="space-y-6 block">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                <!-- Cartão de Boas-Vindas -->
                 <div class="lg:col-span-6 glass-panel p-5 sm:p-6 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
                     <div>
                         <h2 class="text-2xl font-extrabold text-stone-900 mb-2">Olá, grupo! 👋</h2>
@@ -116,7 +119,6 @@
                     </div>
                 </div>
 
-                <!-- Progresso do Fundo -->
                 <div class="lg:col-span-3 bg-teal-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
                     <h3 class="text-sm font-bold mb-2">Progresso do Fundo</h3>
                     <div class="relative w-24 h-24 mb-2">
@@ -129,7 +131,6 @@
                     <p id="total-raised-display" class="text-base font-black mt-1 text-teal-300 italic">R$ 0,00</p>
                 </div>
 
-                <!-- Total de Gastos -->
                 <div class="lg:col-span-3 bg-rose-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
                     <h3 class="text-sm font-bold mb-2">Total de Gastos</h3>
                     <div class="relative w-24 h-24 mb-2">
@@ -142,7 +143,6 @@
                     <p id="total-expenses-display" class="text-base font-black mt-1 text-rose-300 italic">R$ 0,00</p>
                 </div>
 
-                <!-- Resumo: Logística -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Logística</h4>
@@ -151,7 +151,6 @@
                     <div class="relative w-16 h-16"><canvas id="chartLogistica"></canvas></div>
                 </div>
 
-                <!-- Resumo: Alimentação -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Alimentação</h4>
@@ -160,7 +159,6 @@
                     <div class="relative w-16 h-16"><canvas id="chartFood"></canvas></div>
                 </div>
 
-                <!-- Resumo: Bebidas -->
                 <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bebidas</h4>
@@ -353,7 +351,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        
+        // Configuração vital: força sempre o seletor de conta do Google
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'monte-gordo-2026';
 
         const participants = ["Agatha Varjão", "Anailson Santos", "Beatriz Azevedo", "Jonatan Santos", "Miguel Morelli"];
@@ -369,6 +371,11 @@
         let drinkChartInst = null;
         let currentLogs = []; 
         let collapsedDishes = new Set(); 
+        
+        // Armazena os inscritos do onSnapshot para podermos desligar antes do logout
+        let unsubPayments = null;
+        let unsubLogistics = null;
+        let unsubChecklists = null;
 
         window.toggleMenu = () => {
             const menu = document.getElementById('mobile-menu');
@@ -418,7 +425,19 @@
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
 
-        window.sairDoSistema = () => signOut(auth);
+        window.sairDoSistema = () => {
+            // Desliga os ouvintes do banco para evitar o erro de permissão fantasma
+            if (unsubPayments) unsubPayments();
+            if (unsubLogistics) unsubLogistics();
+            if (unsubChecklists) unsubChecklists();
+            
+            signOut(auth).then(() => {
+                const unauthScreen = document.getElementById('unauthorized-screen');
+                unauthScreen.classList.add('hidden');
+                unauthScreen.classList.remove('flex');
+                document.getElementById('login-screen').classList.remove('hidden');
+            });
+        };
 
         onAuthStateChanged(auth, (user) => {
             const loginScreen = document.getElementById('login-screen');
@@ -452,12 +471,13 @@
         });
 
         const handlePermissionError = (err) => {
-            if (err.code === 'permission-denied') {
+            // Só mostra a tela de erro se o usuário ainda estiver ativamente logado
+            if (err.code === 'permission-denied' && currentUser) {
                 document.getElementById('loading').classList.add('hidden');
                 const unauth = document.getElementById('unauthorized-screen');
                 unauth.classList.remove('hidden');
                 unauth.classList.add('flex');
-            } else {
+            } else if (err.code !== 'permission-denied') {
                 console.error("Erro no Firebase:", err);
             }
         };
@@ -465,9 +485,7 @@
         function startSync() {
             if (!currentUser) return;
             
-            // Tenta ouvir os documentos. Se falhar, o handlePermissionError bloqueia a tela.
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
-                // Se chegou aqui com sucesso, o usuário tem acesso e podemos esconder o loading
+            unsubPayments = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
                 document.getElementById('loading').classList.add('hidden');
                 const data = {};
                 snap.forEach(d => data[d.id] = d.data());
@@ -475,13 +493,13 @@
                 updateChart(data);
             }, handlePermissionError);
 
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
+            unsubLogistics = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logistics'), (snap) => {
                 currentLogs = [];
                 snap.forEach(d => currentLogs.push({ id: d.id, ...d.data() }));
                 renderLogistics(currentLogs);
             }, handlePermissionError);
 
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
+            unsubChecklists = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'checklists'), (snap) => {
                 const checks = [];
                 snap.forEach(d => checks.push({ id: d.id, ...d.data() }));
                 renderChecklists(checks);
@@ -718,18 +736,18 @@
                         `;
                     }
 
-                    let addBtnMain = '';
-                    if (ingredients.length === 0) {
-                        addBtnMain = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>`;
-                    }
-
                     let toggleBtnHtml = '';
                     if (ingredients.length > 0) {
                         const isHidden = collapsedDishes.has(d.id);
                         toggleBtnHtml = `<button id="toggle-btn-${d.id}" onclick="toggleIngredients('${d.id}')" class="text-[10px] text-stone-400 hover:text-stone-600 font-bold transition-colors mt-1">${isHidden ? '▼ Ver Ingredientes' : '▲ Ocultar Ingredientes'}</button>`;
                     }
 
-                    // LINHA DO PRATO PRINCIPAL
+                    // Botão adicionar se NÃO TIVER ingredientes
+                    let addBtnTop = '';
+                    if (ingredients.length === 0) {
+                        addBtnTop = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>`;
+                    }
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-stone-50 transition-colors border-b border-stone-100";
                     tr.innerHTML = `
@@ -739,7 +757,7 @@
                         <td class="py-3 px-4 w-full align-middle min-w-[150px]">
                             <input class="table-input font-bold text-stone-800 w-full ${isBought ? 'line-through opacity-40' : ''}" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
                             <div class="flex items-center gap-4">
-                                ${addBtnMain}
+                                ${addBtnTop}
                                 ${toggleBtnHtml}
                             </div>
                         </td>
@@ -755,7 +773,6 @@
                     
                     targetBody.appendChild(tr);
 
-                    // LINHAS DOS INGREDIENTES
                     if (ingredients.length > 0) {
                         const borderClass = isFood ? 'border-orange-200' : 'border-purple-200';
                         
@@ -836,6 +853,7 @@
                             `;
                         });
                         
+                        // Botão adicionar fica EMBEDDED no final da lista
                         ingHtml += `
                             <div class="pt-2">
                                 <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline flex items-center gap-1">
