@@ -12,13 +12,12 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            /* Gradiente pastel suave e fixo no fundo */
             background: linear-gradient(135deg, #e0f2fe 0%, #fdfbfa 50%, #ffe4e6 100%);
             background-attachment: fixed;
             color: var(--stone-900); 
         }
         
-        /* Vidro Fosco aprimorado e OTIMIZADO (sem lag) */
+        /* Vidro Fosco otimizado */
         .glass-panel { 
             background: rgba(255, 255, 255, 0.65); 
             backdrop-filter: blur(12px); 
@@ -39,7 +38,6 @@
     <div id="loading" class="loading-overlay flex flex-col items-center justify-center gap-2">
         <span class="text-5xl animate-bounce mb-2">🌴</span>
         <div class="w-48 h-2 bg-stone-200/50 rounded-full overflow-hidden">
-            <!-- A barra vai preencher via Javascript -->
             <div id="loading-bar" class="h-full bg-teal-500 w-0 transition-all ease-out"></div>
         </div>
         <span id="loading-text" class="text-[10px] font-black text-stone-400 uppercase tracking-widest mt-1">Iniciando...</span>
@@ -74,7 +72,7 @@
         </div>
     </div>
 
-    <!-- CAIXA INVISÍVEL (Só renderiza se for autorizado) -->
+    <!-- CAIXA INVISÍVEL -->
     <div id="app-container" class="hidden">
         
         <!-- Menu Lateral (Drawer) -->
@@ -193,10 +191,10 @@
 
             <!-- SECTION: LOGÍSTICA -->
             <section id="tab-logistica" class="hidden space-y-8">
+                <!-- Alojamento -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4 mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-rose-600"><span>🏠</span> Alojamento</h3>
-                        <button onclick="addLogEntry('airbnb')" class="text-[10px] font-bold bg-white text-rose-600 px-4 py-2 rounded-full shadow-sm hover:bg-rose-50 transition-all border border-white">+ Adicionar Opção</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
@@ -220,12 +218,17 @@
                             </tfoot>
                         </table>
                     </div>
+                    <div class="mt-4 flex">
+                        <button onclick="addLogEntry('airbnb')" class="text-xs font-bold bg-white text-rose-600 px-4 py-2 rounded-xl shadow-sm hover:bg-rose-50 transition-all border border-rose-100 flex items-center gap-2">
+                            <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Opção de Airbnb
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Transportes -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4 mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
-                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-white text-blue-600 px-3 py-2 rounded-full shadow-sm hover:bg-blue-50 transition-all border border-white">+ Adicionar</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
@@ -250,6 +253,11 @@
                             </tfoot>
                         </table>
                     </div>
+                    <div class="mt-4 flex">
+                        <button onclick="addLogEntry('bus')" class="text-xs font-bold bg-white text-blue-600 px-4 py-2 rounded-xl shadow-sm hover:bg-blue-50 transition-all border border-blue-100 flex items-center gap-2">
+                            <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Transporte
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -257,12 +265,9 @@
             <section id="tab-mercado" class="hidden space-y-8">
                 <!-- Alimentação -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <div class="flex items-center gap-4 mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="toggleAll('food')" class="text-[10px] font-bold bg-white/50 text-stone-600 px-3 py-2 rounded-full shadow-sm hover:bg-white transition-all border border-white">↕ Expandir/Ocultar</button>
-                            <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-white text-orange-600 px-4 py-2 rounded-full shadow-sm hover:bg-orange-50 transition-all border border-white">+ Adicionar Prato</button>
-                        </div>
+                        <button onclick="toggleAll('food')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -285,16 +290,18 @@
                             </tfoot>
                         </table>
                     </div>
+                    <div class="mt-4 flex">
+                        <button onclick="addLogEntry('food')" class="text-xs font-bold bg-white text-orange-600 px-4 py-2 rounded-xl shadow-sm hover:bg-orange-50 transition-all border border-orange-100 flex items-center gap-2">
+                            <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Novo Prato
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Bebidas -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <div class="flex items-center gap-4 mb-6">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="toggleAll('drinks')" class="text-[10px] font-bold bg-white/50 text-stone-600 px-3 py-2 rounded-full shadow-sm hover:bg-white transition-all border border-white">↕ Expandir/Ocultar</button>
-                            <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-white text-purple-600 px-4 py-2 rounded-full shadow-sm hover:bg-purple-50 transition-all border border-white">+ Adicionar Bebida</button>
-                        </div>
+                        <button onclick="toggleAll('drinks')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -316,6 +323,11 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+                    <div class="mt-4 flex">
+                        <button onclick="addLogEntry('drinks')" class="text-xs font-bold bg-white text-purple-600 px-4 py-2 rounded-xl shadow-sm hover:bg-purple-50 transition-all border border-purple-100 flex items-center gap-2">
+                            <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Nova Bebida
+                        </button>
                     </div>
                 </div>
             </section>
@@ -343,19 +355,30 @@
             <!-- SECTION: CHECKLIST -->
             <section id="tab-checklist" class="hidden space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Itens Gerais -->
                     <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-4 mb-6">
                             <h3 class="text-xl font-bold flex items-center gap-2 text-teal-700"><span>🎒</span> Itens para levar</h3>
-                            <button onclick="addChecklistItem('general')" class="text-[10px] font-bold bg-white text-teal-600 px-4 py-2 rounded-full shadow-sm hover:bg-teal-50 transition-all border border-white">+ Adicionar</button>
                         </div>
-                        <div id="check-list-general" class="space-y-3"></div>
+                        <div id="check-list-general" class="space-y-3 mb-4"></div>
+                        <div class="mt-4 flex">
+                            <button onclick="addChecklistItem('general')" class="text-xs font-bold bg-white text-teal-600 px-4 py-2 rounded-xl shadow-sm hover:bg-teal-50 transition-all border border-teal-100 flex items-center gap-2">
+                                <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Item
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Outros / Extras -->
                     <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-4 mb-6">
                             <h3 class="text-xl font-bold flex items-center gap-2 text-orange-700"><span>🎁</span> Outros / Extras</h3>
-                            <button onclick="addChecklistItem('extra')" class="text-[10px] font-bold bg-white text-orange-600 px-4 py-2 rounded-full shadow-sm hover:bg-orange-50 transition-all border border-white">+ Adicionar</button>
                         </div>
-                        <div id="check-list-extra" class="space-y-3"></div>
+                        <div id="check-list-extra" class="space-y-3 mb-4"></div>
+                        <div class="mt-4 flex">
+                            <button onclick="addChecklistItem('extra')" class="text-xs font-bold bg-white text-orange-600 px-4 py-2 rounded-xl shadow-sm hover:bg-orange-50 transition-all border border-orange-100 flex items-center gap-2">
+                                <span class="text-lg leading-none mt-[-2px]">+</span> Adicionar Extra
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -367,6 +390,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // ATENÇÃO: Coloque aqui os exatos mesmos e-mails configurados nas Regras do Firestore.
+        const emailsAutorizados = [
+            "seu.email@gmail.com",
+            "agatha.varjao@gmail.com",
+            "anailson@gmail.com",
+            "beatriz@gmail.com",
+            "jonatan@gmail.com",
+            "miguelmorellimedeiros@gmail.com"
+        ];
 
         const firebaseConfig = {
             apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o",
@@ -381,7 +414,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        // Força a janela do Google a sempre perguntar a conta, impedindo login automático na conta errada
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -404,7 +436,7 @@
         let unsubPayments = null;
         let unsubLogistics = null;
         let unsubChecklists = null;
-        let authBackendStatus = 'pending'; // Controle seguro de tela
+        let authBackendStatus = 'pending'; 
 
         window.toggleMenu = () => {
             const menu = document.getElementById('mobile-menu');
@@ -436,7 +468,6 @@
             if (!menu.classList.contains('-translate-x-full')) window.toggleMenu();
         };
 
-        // Recolher/Expandir individual
         window.toggleIngredients = (id) => {
             const rows = document.querySelectorAll(`.ing-row-${id}`);
             const btn = document.getElementById(`toggle-btn-${id}`);
@@ -451,13 +482,10 @@
             }
         };
 
-        // Recolher/Expandir TODOS os pratos de uma categoria
         window.toggleAll = (type) => {
             const itemsWithIngredients = currentLogs.filter(l => l.type === type && l.ingredients && l.ingredients.length > 0);
             if (itemsWithIngredients.length === 0) return;
 
-            // Se existe ALGUM prato que não está recolhido, então a ação será RECOLHER TUDO.
-            // Se TODOS estiverem recolhidos, a ação será EXPANDIR TUDO.
             const anyExpanded = itemsWithIngredients.some(item => !collapsedDishes.has(item.id));
             
             if (anyExpanded) {
@@ -468,7 +496,6 @@
             renderLogistics(currentLogs);
         };
 
-        // --- ANIMAÇÃO GAMER DA TELA DE CARREGAMENTO ---
         function runFakeLoading(callback) {
             const bar = document.getElementById('loading-bar');
             const text = document.getElementById('loading-text');
@@ -505,7 +532,6 @@
             signInWithPopup(auth, provider).catch((error) => console.error("Erro ao logar:", error));
         });
 
-        // Limpeza rigorosa ao sair para evitar que outra conta veja o cache
         window.sairDoSistema = () => {
             if (unsubPayments) unsubPayments();
             if (unsubLogistics) unsubLogistics();
@@ -542,10 +568,22 @@
             const appContainer = document.getElementById('app-container');
             
             if (user) {
+                if (!emailsAutorizados.includes(user.email.toLowerCase())) {
+                    loadingScreen.classList.add('hidden');
+                    loadingScreen.classList.remove('flex');
+                    appContainer.classList.add('hidden');
+                    loginScreen.classList.add('hidden');
+                    loginScreen.classList.remove('flex');
+                    
+                    document.getElementById('unauth-email').innerText = user.email;
+                    unauthScreen.classList.remove('hidden');
+                    unauthScreen.classList.add('flex');
+                    return; 
+                }
+
                 currentUser = user;
-                authBackendStatus = 'pending'; // Zera o status de segurança
+                authBackendStatus = 'pending';
                 
-                // Esconde login e erro, mostra só o loading e roda a animação
                 loginScreen.classList.add('hidden');
                 loginScreen.classList.remove('flex');
                 unauthScreen.classList.add('hidden');
@@ -564,9 +602,8 @@
                     <button onclick="sairDoSistema()" class="text-xs font-bold bg-rose-50/90 text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-200/50 shadow-sm">Sair</button>
                 `;
                 
-                startSync(); // Pede autorização ao Firebase no background
+                startSync(); 
                 
-                // Quando a barra terminar de encher (1.6s depois), decide o que mostrar
                 runFakeLoading(() => {
                     loadingScreen.classList.add('hidden');
                     loadingScreen.classList.remove('flex');
@@ -857,11 +894,6 @@
                         `;
                     }
 
-                    let addBtnTop = '';
-                    if (ingredients.length === 0) {
-                        addBtnTop = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1 drop-shadow-sm">+ Adicionar Ingrediente</button>`;
-                    }
-
                     let toggleBtnHtml = '';
                     if (ingredients.length > 0) {
                         const isHidden = collapsedDishes.has(d.id);
@@ -877,7 +909,6 @@
                         <td class="py-3 px-4 w-full align-middle min-w-[150px]">
                             <input class="table-input font-bold text-stone-800 w-full ${isBought ? 'line-through opacity-40' : ''}" value="${name}" onblur="updateLog('${d.id}', 'name', this.value)">
                             <div class="flex items-center gap-4">
-                                ${addBtnTop}
                                 ${toggleBtnHtml}
                             </div>
                         </td>
@@ -987,6 +1018,12 @@
                         subTrWrapper.className = `ing-row-${d.id} ${collapsedDishes.has(d.id) ? 'hidden' : ''}`;
                         subTrWrapper.innerHTML = ingHtml;
                         targetBody.appendChild(subTrWrapper);
+                    } else {
+                        // Se não tem ingredientes e o prato existe, adiciona botão de adicionar ingrediente abaixo do nome
+                        const addIngCell = tr.querySelector('td:nth-child(2) div');
+                        if(addIngCell) {
+                            addIngCell.innerHTML = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1 drop-shadow-sm">+ Adicionar Ingrediente</button>`;
+                        }
                     }
                 }
             });
