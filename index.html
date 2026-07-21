@@ -265,9 +265,11 @@
             <section id="tab-mercado" class="hidden space-y-8">
                 <!-- Alimentação -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex items-center gap-4 mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
-                        <button onclick="toggleAll('food')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleAll('food')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar Todos</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -299,9 +301,11 @@
 
                 <!-- Bebidas -->
                 <div class="glass-panel p-8 rounded-3xl custom-shadow">
-                    <div class="flex items-center gap-4 mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
-                        <button onclick="toggleAll('drinks')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleAll('drinks')" class="text-[10px] font-bold bg-white/70 text-stone-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-all border border-stone-200/50">↕ Expandir/Ocultar Todos</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm" style="table-layout: auto;">
@@ -391,16 +395,7 @@
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // ATENÇÃO: Coloque aqui os exatos mesmos e-mails configurados nas Regras do Firestore.
-        const emailsAutorizados = [
-            "seu.email@gmail.com",
-            "agatha.varjao@gmail.com",
-            "anailson@gmail.com",
-            "beatriz@gmail.com",
-            "jonatan@gmail.com",
-            "miguelmorellimedeiros@gmail.com"
-        ];
-
+        // As configurações de Firebase são públicas e seguras (as regras blindam o banco)
         const firebaseConfig = {
             apiKey: "AIzaSyAXBC1uJYzNoSoJ0zpT7bLxZgBZfRIxc8o",
             authDomain: "viagemfimdeano2026.firebaseapp.com",
@@ -568,19 +563,6 @@
             const appContainer = document.getElementById('app-container');
             
             if (user) {
-                if (!emailsAutorizados.includes(user.email.toLowerCase())) {
-                    loadingScreen.classList.add('hidden');
-                    loadingScreen.classList.remove('flex');
-                    appContainer.classList.add('hidden');
-                    loginScreen.classList.add('hidden');
-                    loginScreen.classList.remove('flex');
-                    
-                    document.getElementById('unauth-email').innerText = user.email;
-                    unauthScreen.classList.remove('hidden');
-                    unauthScreen.classList.add('flex');
-                    return; 
-                }
-
                 currentUser = user;
                 authBackendStatus = 'pending';
                 
@@ -630,10 +612,11 @@
             }
         });
 
+        // O Firebase grita aqui em caso de e-mail bloqueado por ele mesmo
         const handlePermissionError = (err) => {
-            if (err.code === 'permission-denied' && currentUser) {
+            if (err.code === 'permission-denied') {
                 authBackendStatus = 'denied'; 
-            } else if (err.code !== 'permission-denied') {
+            } else {
                 console.error("Erro no Firebase:", err);
             }
         };
@@ -1019,7 +1002,6 @@
                         subTrWrapper.innerHTML = ingHtml;
                         targetBody.appendChild(subTrWrapper);
                     } else {
-                        // Se não tem ingredientes e o prato existe, adiciona botão de adicionar ingrediente abaixo do nome
                         const addIngCell = tr.querySelector('td:nth-child(2) div');
                         if(addIngCell) {
                             addIngCell.innerHTML = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1 drop-shadow-sm">+ Adicionar Ingrediente</button>`;
