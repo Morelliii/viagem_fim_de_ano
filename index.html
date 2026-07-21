@@ -13,7 +13,8 @@
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(229, 231, 235, 0.5); }
         .custom-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
         input:focus, select:focus { outline: none; border-bottom: 2px solid var(--primary); }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        /* Transparência removida, agora o fundo é sólido com a cor do site */
+        .loading-overlay { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 9998; }
         .table-input { background: transparent; width: 100%; padding: 4px; border-bottom: 1px solid transparent; transition: all 0.2s; }
         .table-input:hover { border-bottom-color: #e5e7eb; }
         .table-input:focus { border-bottom-color: var(--primary); background: rgba(13, 148, 136, 0.05); }
@@ -55,283 +56,287 @@
         </div>
     </div>
 
-    <!-- Menu Lateral (Drawer) -->
-    <div id="mobile-menu" class="fixed inset-y-0 left-0 w-72 bg-white z-[10000] transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
-        <div class="p-6 flex justify-between items-center border-b border-stone-100">
-            <div class="flex items-center gap-3">
-                <span class="text-3xl">🌴</span>
-                <h2 class="font-extrabold text-xl text-teal-900">Menu</h2>
+    <!-- CAIXA INVISÍVEL (Só renderiza se for autorizado) -->
+    <div id="app-container" class="hidden">
+        
+        <!-- Menu Lateral (Drawer) -->
+        <div id="mobile-menu" class="fixed inset-y-0 left-0 w-72 bg-white z-[10000] transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+            <div class="p-6 flex justify-between items-center border-b border-stone-100">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🌴</span>
+                    <h2 class="font-extrabold text-xl text-teal-900">Menu</h2>
+                </div>
+                <button onclick="toggleMenu()" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">✕</button>
             </div>
-            <button onclick="toggleMenu()" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">✕</button>
+            <nav class="flex flex-col p-4 gap-2">
+                <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="text-left px-4 py-3 rounded-xl font-bold text-teal-900 bg-teal-50 transition-all tab-btn">Resumo</button>
+                <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Logística</button>
+                <button onclick="switchTab('mercado')" id="tab-btn-mercado" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Mercado</button>
+                <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Financeiro</button>
+                <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Itens para levar</button>
+            </nav>
         </div>
-        <nav class="flex flex-col p-4 gap-2">
-            <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="text-left px-4 py-3 rounded-xl font-bold text-teal-900 bg-teal-50 transition-all tab-btn">Resumo</button>
-            <button onclick="switchTab('logistica')" id="tab-btn-logistica" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Logística</button>
-            <button onclick="switchTab('mercado')" id="tab-btn-mercado" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Mercado</button>
-            <button onclick="switchTab('financeiro')" id="tab-btn-financeiro" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Financeiro</button>
-            <button onclick="switchTab('checklist')" id="tab-btn-checklist" class="text-left px-4 py-3 rounded-xl font-bold text-stone-500 hover:bg-stone-50 hover:text-teal-900 transition-all tab-btn">Itens para levar</button>
-        </nav>
-    </div>
-    
-    <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-stone-900/50 z-[9999] hidden opacity-0 transition-opacity duration-300"></div>
+        
+        <div id="menu-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-stone-900/50 z-[9999] hidden opacity-0 transition-opacity duration-300"></div>
 
-    <!-- Cabeçalho Principal -->
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleMenu()" class="text-2xl p-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-teal-900 transition-colors shadow-sm">☰</button>
-                <button onclick="switchTab('resumo')" class="flex items-center gap-3 hover:opacity-75 transition-opacity text-left">
-                    <span class="text-3xl hidden sm:block">🌴</span>
-                    <div>
-                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-teal-900">Réveillon</h1>
-                        <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest hidden sm:block">Dashboard Colaborativo</p>
-                    </div>
-                </button>
+        <!-- Cabeçalho Principal -->
+        <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleMenu()" class="text-2xl p-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-teal-900 transition-colors shadow-sm">☰</button>
+                    <button onclick="switchTab('resumo')" class="flex items-center gap-3 hover:opacity-75 transition-opacity text-left">
+                        <span class="text-3xl hidden sm:block">🌴</span>
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-teal-900">Réveillon</h1>
+                            <p class="text-[10px] uppercase font-bold text-stone-400 tracking-widest hidden sm:block">Dashboard Colaborativo</p>
+                        </div>
+                    </button>
+                </div>
+                <div id="user-display" class="flex items-center gap-3"></div>
             </div>
-            <div id="user-display" class="flex items-center gap-3"></div>
-        </div>
-    </header>
+        </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-8">
-        <!-- SECTION: RESUMO -->
-        <section id="tab-resumo" class="space-y-6 block">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-                <div class="lg:col-span-6 glass-panel p-5 sm:p-6 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
-                    <div>
-                        <h2 class="text-2xl font-extrabold text-stone-900 mb-2">Olá, grupo! 👋</h2>
-                        <p class="text-stone-600 text-sm leading-relaxed max-w-lg">
-                            Bem-vindos ao quadro colaborativo. Qualquer alteração em custos ou pagamentos será atualizada em tempo real para todos.
-                        </p>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3 mt-5">
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Ida</span>
-                            <span class="text-sm font-bold text-teal-800">29 Dez 26</span>
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            <!-- SECTION: RESUMO -->
+            <section id="tab-resumo" class="space-y-6 block">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                    <div class="lg:col-span-6 glass-panel p-5 sm:p-6 rounded-3xl custom-shadow flex flex-col justify-between border-l-8 border-teal-600">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-stone-900 mb-2">Olá, grupo! 👋</h2>
+                            <p class="text-stone-600 text-sm leading-relaxed max-w-lg">
+                                Bem-vindos ao quadro colaborativo. Qualquer alteração em custos ou pagamentos será atualizada em tempo real para todos.
+                            </p>
                         </div>
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Volta</span>
-                            <span class="text-sm font-bold text-teal-800">02 Jan 27</span>
-                        </div>
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span class="block text-[10px] font-bold text-stone-400 uppercase">Estadia</span>
-                            <span class="text-sm font-bold text-teal-800">4 Noites</span>
+                        <div class="grid grid-cols-3 gap-3 mt-5">
+                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                                <span class="block text-[10px] font-bold text-stone-400 uppercase">Ida</span>
+                                <span class="text-sm font-bold text-teal-800">29 Dez 26</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                                <span class="block text-[10px] font-bold text-stone-400 uppercase">Volta</span>
+                                <span class="text-sm font-bold text-teal-800">02 Jan 27</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                                <span class="block text-[10px] font-bold text-stone-400 uppercase">Estadia</span>
+                                <span class="text-sm font-bold text-teal-800">4 Noites</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="lg:col-span-3 bg-teal-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
-                    <h3 class="text-sm font-bold mb-2">Progresso do Fundo</h3>
-                    <div class="relative w-24 h-24 mb-2">
-                        <canvas id="progressChart"></canvas>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="pct-display" class="text-lg font-black">0%</span>
+                    <div class="lg:col-span-3 bg-teal-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
+                        <h3 class="text-sm font-bold mb-2">Progresso do Fundo</h3>
+                        <div class="relative w-24 h-24 mb-2">
+                            <canvas id="progressChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="pct-display" class="text-lg font-black">0%</span>
+                            </div>
                         </div>
+                        <p class="text-[9px] opacity-80">Meta: R$ 3.850,00</p>
+                        <p id="total-raised-display" class="text-base font-black mt-1 text-teal-300 italic">R$ 0,00</p>
                     </div>
-                    <p class="text-[9px] opacity-80">Meta: R$ 3.850,00</p>
-                    <p id="total-raised-display" class="text-base font-black mt-1 text-teal-300 italic">R$ 0,00</p>
-                </div>
 
-                <div class="lg:col-span-3 bg-rose-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
-                    <h3 class="text-sm font-bold mb-2">Total de Gastos</h3>
-                    <div class="relative w-24 h-24 mb-2">
-                        <canvas id="expensesChart"></canvas>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="expenses-pct-display" class="text-lg font-black">0%</span>
+                    <div class="lg:col-span-3 bg-rose-900 text-white p-5 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center">
+                        <h3 class="text-sm font-bold mb-2">Total de Gastos</h3>
+                        <div class="relative w-24 h-24 mb-2">
+                            <canvas id="expensesChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="expenses-pct-display" class="text-lg font-black">0%</span>
+                            </div>
                         </div>
+                        <p class="text-[9px] opacity-80">Orçamento: R$ 3.850,00</p>
+                        <p id="total-expenses-display" class="text-base font-black mt-1 text-rose-300 italic">R$ 0,00</p>
                     </div>
-                    <p class="text-[9px] opacity-80">Orçamento: R$ 3.850,00</p>
-                    <p id="total-expenses-display" class="text-base font-black mt-1 text-rose-300 italic">R$ 0,00</p>
-                </div>
 
-                <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Logística</h4>
-                        <p id="resumo-logistica" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                    <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Logística</h4>
+                            <p id="resumo-logistica" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                        </div>
+                        <div class="relative w-16 h-16"><canvas id="chartLogistica"></canvas></div>
                     </div>
-                    <div class="relative w-16 h-16"><canvas id="chartLogistica"></canvas></div>
-                </div>
 
-                <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Alimentação</h4>
-                        <p id="resumo-food" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                    <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Alimentação</h4>
+                            <p id="resumo-food" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                        </div>
+                        <div class="relative w-16 h-16"><canvas id="chartFood"></canvas></div>
                     </div>
-                    <div class="relative w-16 h-16"><canvas id="chartFood"></canvas></div>
-                </div>
 
-                <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bebidas</h4>
-                        <p id="resumo-drinks" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                    <div class="lg:col-span-4 bg-white p-5 rounded-3xl custom-shadow border border-stone-100 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Bebidas</h4>
+                            <p id="resumo-drinks" class="text-lg font-black text-stone-700">R$ 0,00</p>
+                        </div>
+                        <div class="relative w-16 h-16"><canvas id="chartDrinks"></canvas></div>
                     </div>
-                    <div class="relative w-16 h-16"><canvas id="chartDrinks"></canvas></div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- SECTION: LOGÍSTICA -->
-        <section id="tab-logistica" class="hidden space-y-8">
-            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold flex items-center gap-2 text-rose-600"><span>🏠</span> Alojamento</h3>
-                    <button onclick="addLogEntry('airbnb')" class="text-[10px] font-bold bg-rose-50 text-rose-600 px-4 py-2 rounded-full hover:bg-rose-100 transition-all">+ Adicionar Opção</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-2 text-center" title="Opção Escolhida">✓</th>
-                                <th class="py-3 px-4 min-w-[150px]">Airbnb</th>
-                                <th class="py-3 px-4 min-w-[150px]">Obs / Detalhes</th>
-                                <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
-                                <th class="py-3 px-4 min-w-[180px]">Link</th>
-                                <th class="py-3 px-4 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="airbnb-table-body" class="divide-y divide-stone-50"></tbody>
-                        <tfoot class="bg-stone-50/50 border-t border-stone-100">
-                            <tr>
-                                <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Alojamento:</td>
-                                <td id="airbnb-total" class="py-4 px-4 text-center font-black text-rose-600">R$ 0,00</td>
-                                <td colspan="2"><span class="text-[10px] text-stone-400 font-medium ml-2">(Soma apenas a opção marcada)</span></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
-                    <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-100">+ Adicionar</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-4 min-w-[150px]">Cia / Rota</th>
-                                <th class="py-3 px-2 text-center w-24">Tarifa (R$)</th>
-                                <th class="py-3 px-2 text-center w-16" title="Quantidade de Pessoas">Qtd</th>
-                                <th class="py-3 px-2 text-center w-20">Ida/Volta</th>
-                                <th class="py-3 px-4 text-center w-28">Total (R$)</th>
-                                <th class="py-3 px-4 min-w-[180px]">Link</th>
-                                <th class="py-3 px-4 text-right">Remover</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bus-table-body" class="divide-y divide-stone-50"></tbody>
-                        <tfoot class="bg-stone-50/50 border-t border-stone-100">
-                            <tr>
-                                <td colspan="4" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Transportes:</td>
-                                <td id="bus-total" class="py-4 px-4 text-center font-black text-blue-600">R$ 0,00</td>
-                                <td colspan="2"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: MERCADO -->
-        <section id="tab-mercado" class="hidden space-y-8">
-            <!-- Alimentação -->
-            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
-                    <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Prato</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm" style="table-layout: auto;">
-                        <thead>
-                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-2 text-center w-10">✓</th>
-                                <th class="py-3 px-4 w-full min-w-[150px]">Prato / Item</th>
-                                <th class="py-3 px-2 text-center w-32 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
-                                <th class="py-3 px-4 text-right w-16 whitespace-nowrap">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="food-table-body" class="divide-y divide-stone-50"></tbody>
-                        <tfoot class="bg-stone-50/50 border-t border-stone-100">
-                            <tr>
-                                <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Comida:</td>
-                                <td id="food-total" class="py-4 px-4 text-center font-black text-orange-600">R$ 0,00</td>
-                                <td colspan="1"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Bebidas -->
-            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
-                    <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-purple-50 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-100">+ Adicionar Bebida</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm" style="table-layout: auto;">
-                        <thead>
-                            <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
-                                <th class="py-3 px-2 text-center w-10">✓</th>
-                                <th class="py-3 px-4 w-full min-w-[150px]">Bebida / Item</th>
-                                <th class="py-3 px-2 text-center w-32 whitespace-nowrap">Qtd.</th>
-                                <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
-                                <th class="py-3 px-4 text-right w-16 whitespace-nowrap">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="drinks-table-body" class="divide-y divide-stone-50"></tbody>
-                        <tfoot class="bg-stone-50/50 border-t border-stone-100">
-                            <tr>
-                                <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Bebidas:</td>
-                                <td id="drinks-total" class="py-4 px-4 text-center font-black text-purple-600">R$ 0,00</td>
-                                <td colspan="1"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: FINANCEIRO -->
-        <section id="tab-financeiro" class="hidden space-y-6">
-            <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100 overflow-x-auto">
-                <div class="mb-6">
-                    <h3 class="text-2xl font-extrabold text-stone-900">Mapa de Pagamentos</h3>
-                    <p class="text-stone-500 text-xs mt-1">Clica no círculo para alternar o pagamento (R$ 80 de Abr a Jul | R$ 90 a partir de Ago).</p>
-                </div>
-                <table class="w-full text-center border-separate border-spacing-y-2">
-                    <thead>
-                        <tr class="text-[10px] font-bold text-stone-400 uppercase">
-                            <th class="px-4 py-2 text-left">Nome</th>
-                            <th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th><th>Out</th><th>Nov</th><th>Dez</th>
-                            <th class="text-right">Fundo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="payments-table-body" class="text-sm"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- SECTION: CHECKLIST -->
-        <section id="tab-checklist" class="hidden space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- SECTION: LOGÍSTICA -->
+            <section id="tab-logistica" class="hidden space-y-8">
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-teal-700"><span>🎒</span> Itens para levar</h3>
-                        <button onclick="addChecklistItem('general')" class="text-[10px] font-bold bg-teal-50 text-teal-600 px-3 py-1 rounded-full hover:bg-teal-100">+ Adicionar</button>
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-rose-600"><span>🏠</span> Alojamento</h3>
+                        <button onclick="addLogEntry('airbnb')" class="text-[10px] font-bold bg-rose-50 text-rose-600 px-4 py-2 rounded-full hover:bg-rose-100 transition-all">+ Adicionar Opção</button>
                     </div>
-                    <div id="check-list-general" class="space-y-3"></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-2 text-center" title="Opção Escolhida">✓</th>
+                                    <th class="py-3 px-4 min-w-[150px]">Airbnb</th>
+                                    <th class="py-3 px-4 min-w-[150px]">Obs / Detalhes</th>
+                                    <th class="py-3 px-4 text-center w-28">Valor (R$)</th>
+                                    <th class="py-3 px-4 min-w-[180px]">Link</th>
+                                    <th class="py-3 px-4 text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="airbnb-table-body" class="divide-y divide-stone-50"></tbody>
+                            <tfoot class="bg-stone-50/50 border-t border-stone-100">
+                                <tr>
+                                    <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Alojamento:</td>
+                                    <td id="airbnb-total" class="py-4 px-4 text-center font-black text-rose-600">R$ 0,00</td>
+                                    <td colspan="2"><span class="text-[10px] text-stone-400 font-medium ml-2">(Soma apenas a opção marcada)</span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
+
                 <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-700"><span>🎁</span> Outros / Extras</h3>
-                        <button onclick="addChecklistItem('extra')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-1 rounded-full hover:bg-orange-100">+ Adicionar</button>
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600"><span>🚌</span> Transportes</h3>
+                        <button onclick="addLogEntry('bus')" class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-100">+ Adicionar</button>
                     </div>
-                    <div id="check-list-extra" class="space-y-3"></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-4 min-w-[150px]">Cia / Rota</th>
+                                    <th class="py-3 px-2 text-center w-24">Tarifa (R$)</th>
+                                    <th class="py-3 px-2 text-center w-16" title="Quantidade de Pessoas">Qtd</th>
+                                    <th class="py-3 px-2 text-center w-20">Ida/Volta</th>
+                                    <th class="py-3 px-4 text-center w-28">Total (R$)</th>
+                                    <th class="py-3 px-4 min-w-[180px]">Link</th>
+                                    <th class="py-3 px-4 text-right">Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bus-table-body" class="divide-y divide-stone-50"></tbody>
+                            <tfoot class="bg-stone-50/50 border-t border-stone-100">
+                                <tr>
+                                    <td colspan="4" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Transportes:</td>
+                                    <td id="bus-total" class="py-4 px-4 text-center font-black text-blue-600">R$ 0,00</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </section>
-    </main>
+            </section>
+
+            <!-- SECTION: MERCADO -->
+            <section id="tab-mercado" class="hidden space-y-8">
+                <!-- Alimentação -->
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-orange-600"><span>🛒</span> Comidas / Pratos</h3>
+                        <button onclick="addLogEntry('food')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-2 rounded-full hover:bg-orange-100">+ Adicionar Prato</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm" style="table-layout: auto;">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-2 text-center w-10">✓</th>
+                                    <th class="py-3 px-4 w-full min-w-[150px]">Prato / Item</th>
+                                    <th class="py-3 px-2 text-center w-32 whitespace-nowrap">Qtd.</th>
+                                    <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
+                                    <th class="py-3 px-4 text-right w-16 whitespace-nowrap">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="food-table-body" class="divide-y divide-stone-50"></tbody>
+                            <tfoot class="bg-stone-50/50 border-t border-stone-100">
+                                <tr>
+                                    <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Comida:</td>
+                                    <td id="food-total" class="py-4 px-4 text-center font-black text-orange-600">R$ 0,00</td>
+                                    <td colspan="1"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bebidas -->
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-purple-600"><span>🍻</span> Bebidas / Drinks</h3>
+                        <button onclick="addLogEntry('drinks')" class="text-[10px] font-bold bg-purple-50 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-100">+ Adicionar Bebida</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm" style="table-layout: auto;">
+                            <thead>
+                                <tr class="text-[10px] font-black text-stone-400 uppercase border-b border-stone-100">
+                                    <th class="py-3 px-2 text-center w-10">✓</th>
+                                    <th class="py-3 px-4 w-full min-w-[150px]">Bebida / Item</th>
+                                    <th class="py-3 px-2 text-center w-32 whitespace-nowrap">Qtd.</th>
+                                    <th class="py-3 px-4 text-center min-w-[250px] whitespace-nowrap">Valor / Total</th>
+                                    <th class="py-3 px-4 text-right w-16 whitespace-nowrap">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drinks-table-body" class="divide-y divide-stone-50"></tbody>
+                            <tfoot class="bg-stone-50/50 border-t border-stone-100">
+                                <tr>
+                                    <td colspan="3" class="py-4 px-4 text-right text-xs font-bold text-stone-500 uppercase">Subtotal Bebidas:</td>
+                                    <td id="drinks-total" class="py-4 px-4 text-center font-black text-purple-600">R$ 0,00</td>
+                                    <td colspan="1"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: FINANCEIRO -->
+            <section id="tab-financeiro" class="hidden space-y-6">
+                <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100 overflow-x-auto">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-extrabold text-stone-900">Mapa de Pagamentos</h3>
+                        <p class="text-stone-500 text-xs mt-1">Clica no círculo para alternar o pagamento (R$ 80 de Abr a Jul | R$ 90 a partir de Ago).</p>
+                    </div>
+                    <table class="w-full text-center border-separate border-spacing-y-2">
+                        <thead>
+                            <tr class="text-[10px] font-bold text-stone-400 uppercase">
+                                <th class="px-4 py-2 text-left">Nome</th>
+                                <th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th><th>Out</th><th>Nov</th><th>Dez</th>
+                                <th class="text-right">Fundo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table-body" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION: CHECKLIST -->
+            <section id="tab-checklist" class="hidden space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold flex items-center gap-2 text-teal-700"><span>🎒</span> Itens para levar</h3>
+                            <button onclick="addChecklistItem('general')" class="text-[10px] font-bold bg-teal-50 text-teal-600 px-3 py-1 rounded-full hover:bg-teal-100">+ Adicionar</button>
+                        </div>
+                        <div id="check-list-general" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl custom-shadow border border-stone-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold flex items-center gap-2 text-orange-700"><span>🎁</span> Outros / Extras</h3>
+                            <button onclick="addChecklistItem('extra')" class="text-[10px] font-bold bg-orange-50 text-orange-600 px-3 py-1 rounded-full hover:bg-orange-100">+ Adicionar</button>
+                        </div>
+                        <div id="check-list-extra" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div> <!-- Fim da CAIXA INVISÍVEL -->
 
     <!-- Firebase SDKs & Lógica -->
     <script type="module">
@@ -352,7 +357,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        // Configuração vital: força sempre o seletor de conta do Google
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -372,7 +376,6 @@
         let currentLogs = []; 
         let collapsedDishes = new Set(); 
         
-        // Armazena os inscritos do onSnapshot para podermos desligar antes do logout
         let unsubPayments = null;
         let unsubLogistics = null;
         let unsubChecklists = null;
@@ -426,7 +429,6 @@
         });
 
         window.sairDoSistema = () => {
-            // Desliga os ouvintes do banco para evitar o erro de permissão fantasma
             if (unsubPayments) unsubPayments();
             if (unsubLogistics) unsubLogistics();
             if (unsubChecklists) unsubChecklists();
@@ -435,6 +437,7 @@
                 const unauthScreen = document.getElementById('unauthorized-screen');
                 unauthScreen.classList.add('hidden');
                 unauthScreen.classList.remove('flex');
+                document.getElementById('app-container').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
             });
         };
@@ -444,12 +447,14 @@
             const loadingScreen = document.getElementById('loading');
             const userDisplay = document.getElementById('user-display');
             const unauthScreen = document.getElementById('unauthorized-screen');
+            const appContainer = document.getElementById('app-container');
             
             if (user) {
                 currentUser = user;
                 loginScreen.classList.add('hidden');
-                loadingScreen.classList.remove('hidden'); // Exibe loading enquanto busca no Firebase
+                loadingScreen.classList.remove('hidden'); 
                 unauthScreen.classList.add('hidden');
+                appContainer.classList.add('hidden');
                 
                 document.getElementById('unauth-email').innerText = user.email;
                 userDisplay.innerHTML = `
@@ -466,14 +471,15 @@
                 loadingScreen.classList.add('hidden');
                 unauthScreen.classList.add('hidden');
                 unauthScreen.classList.remove('flex');
+                appContainer.classList.add('hidden');
                 loginScreen.classList.remove('hidden');
             }
         });
 
         const handlePermissionError = (err) => {
-            // Só mostra a tela de erro se o usuário ainda estiver ativamente logado
             if (err.code === 'permission-denied' && currentUser) {
                 document.getElementById('loading').classList.add('hidden');
+                document.getElementById('app-container').classList.add('hidden');
                 const unauth = document.getElementById('unauthorized-screen');
                 unauth.classList.remove('hidden');
                 unauth.classList.add('flex');
@@ -487,6 +493,8 @@
             
             unsubPayments = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (snap) => {
                 document.getElementById('loading').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                
                 const data = {};
                 snap.forEach(d => data[d.id] = d.data());
                 renderPayments(data);
@@ -736,16 +744,15 @@
                         `;
                     }
 
+                    let addBtnTop = '';
+                    if (ingredients.length === 0) {
+                        addBtnTop = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>`;
+                    }
+
                     let toggleBtnHtml = '';
                     if (ingredients.length > 0) {
                         const isHidden = collapsedDishes.has(d.id);
                         toggleBtnHtml = `<button id="toggle-btn-${d.id}" onclick="toggleIngredients('${d.id}')" class="text-[10px] text-stone-400 hover:text-stone-600 font-bold transition-colors mt-1">${isHidden ? '▼ Ver Ingredientes' : '▲ Ocultar Ingredientes'}</button>`;
-                    }
-
-                    // Botão adicionar se NÃO TIVER ingredientes
-                    let addBtnTop = '';
-                    if (ingredients.length === 0) {
-                        addBtnTop = `<button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline block mt-1">+ Adicionar Ingrediente</button>`;
                     }
 
                     const tr = document.createElement('tr');
@@ -853,7 +860,6 @@
                             `;
                         });
                         
-                        // Botão adicionar fica EMBEDDED no final da lista
                         ingHtml += `
                             <div class="pt-2">
                                 <button onclick="addIngredient('${d.id}')" class="text-[10px] ${colorClass} font-bold hover:underline flex items-center gap-1">
